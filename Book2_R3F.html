@@ -1,0 +1,1964 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>React Three Fiber for Interactive 3D Portfolio Experiences — Book II</title>
+<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/3/3f/Three.js_Icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ivory:#fbf8f3;
+  --paper:#f6f1e7;
+  --cream:#efe7d4;
+  --ink:#1d1a15;
+  --ink-soft:#3a342a;
+  --muted:#6b6256;
+  --line:#d9cfb8;
+  --gold:#a8864b;
+  --gold-soft:#c9a866;
+  --rose:#b26a54;
+  --sage:#6a7a55;
+  --shadow:0 20px 60px -25px rgba(40,30,10,.25);
+  --shadow-soft:0 8px 28px -12px rgba(40,30,10,.18);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--ivory);
+  color:var(--ink);
+  font-size:17px;
+  line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,.serif{font-family:'Cormorant Garamond',Georgia,serif;font-weight:500;letter-spacing:.2px;color:var(--ink)}
+h1{font-size:clamp(2.6rem,6vw,5.2rem);line-height:1.02;font-weight:500}
+h2{font-size:clamp(2rem,3.6vw,3.2rem);line-height:1.1;margin:0 0 .6em;font-weight:500}
+h3{font-size:1.75rem;line-height:1.2;margin:1.8em 0 .5em;font-weight:600}
+h4{font-size:1.3rem;margin:1.4em 0 .4em;font-weight:600}
+p{margin:0 0 1.1em;color:var(--ink-soft)}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .3s}
+a:hover{border-color:var(--gold)}
+code,pre{font-family:'JetBrains Mono',monospace;font-size:.88em}
+code{background:var(--cream);padding:.1em .4em;border-radius:4px;color:var(--ink)}
+pre{background:#201c15;color:#f3ead4;padding:1.2em 1.4em;border-radius:10px;overflow-x:auto;line-height:1.55;box-shadow:var(--shadow-soft);font-size:.82em}
+pre code{background:transparent;padding:0;color:inherit}
+
+/* Layout */
+.wrap{max-width:980px;margin:0 auto;padding:0 2rem}
+section{padding:5.5rem 0;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+
+/* NAV */
+nav.top{
+  position:sticky;top:0;z-index:50;
+  background:rgba(251,248,243,.92);
+  backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--line);
+}
+nav.top .wrap{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem}
+nav.top .brand{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;color:var(--ink)}
+nav.top .brand span{color:var(--gold)}
+nav.top ul{display:flex;gap:1.8rem;list-style:none;margin:0;padding:0;font-size:.82rem;text-transform:uppercase;letter-spacing:.15em}
+nav.top ul a{color:var(--muted);border:none}
+nav.top ul a:hover{color:var(--gold)}
+@media(max-width:760px){nav.top ul{display:none}}
+
+/* HERO */
+.hero{
+  position:relative;
+  min-height:96vh;
+  display:flex;align-items:center;
+  padding:6rem 0 5rem;
+  background:
+    radial-gradient(ellipse at 20% 10%,rgba(201,168,102,.18),transparent 60%),
+    radial-gradient(ellipse at 80% 90%,rgba(178,106,84,.10),transparent 55%),
+    linear-gradient(180deg,var(--ivory),var(--paper));
+  overflow:hidden;
+}
+.hero .wrap{position:relative;z-index:2}
+
+/* Particle canvas */
+#heroCanvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  z-index:0;pointer-events:none;opacity:.5;
+}
+
+/* Atmospheric orbs */
+.atmos{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.orb{
+  position:absolute;border-radius:50%;filter:blur(70px);
+  animation:drift 20s ease-in-out infinite alternate;
+  will-change:transform;
+  transition:transform 1.2s cubic-bezier(.25,.46,.45,.94);
+}
+.orb.a{width:500px;height:500px;background:radial-gradient(circle,rgba(212,168,92,.32),transparent 70%);top:-12%;right:-8%}
+.orb.b{width:420px;height:420px;background:radial-gradient(circle,rgba(197,141,115,.25),transparent 70%);bottom:-14%;left:-10%;animation-delay:-7s}
+.orb.c{width:340px;height:340px;background:radial-gradient(circle,rgba(141,163,130,.2),transparent 70%);top:32%;left:40%;animation-delay:-14s}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(28px,-18px,0) scale(1.1)}}
+
+/* Staggered entrance */
+@keyframes heroUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.h-enter{opacity:0;animation:heroUp .9s cubic-bezier(.16,1,.3,1) forwards}
+.hero .eyebrow{animation-delay:.05s}
+.hero h1{animation-delay:.22s}
+.hero .sub{animation-delay:.4s}
+.hero .lede{animation-delay:.55s}
+.hero .cta-wrap{animation-delay:.72s}
+
+/* Eyebrow lines animate in */
+.hero .eyebrow::before,.hero .eyebrow::after{
+  content:"";height:1px;background:var(--gold);
+  width:0;animation:lineIn .7s cubic-bezier(.16,1,.3,1) .55s forwards;
+}
+@keyframes lineIn{to{width:40px}}
+
+/* Title shimmer on gold em */
+.hero h1{margin:.2em 0 .4em;max-width:16ch}
+.hero h1 em{
+  font-style:italic;
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold-soft) 42%,#f0d898 50%,var(--gold-soft) 58%,var(--gold) 100%);
+  background-size:250% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:shimmer 4s linear 1.2s infinite;
+}
+@keyframes shimmer{to{background-position:-250% center}}
+
+.hero .sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.3rem,2.2vw,1.85rem);
+  font-style:italic;color:var(--ink-soft);
+  max-width:40ch;line-height:1.4;margin-bottom:1.8rem;
+}
+.hero .lede{max-width:55ch;color:var(--muted);font-size:1.02rem}
+
+/* CTA — shimmer sweep */
+.hero .cta{
+  display:inline-block;margin-top:2.2rem;
+  padding:1rem 2.2rem;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  font-size:.78rem;letter-spacing:.25em;text-transform:uppercase;
+  transition:background .4s,color .4s,box-shadow .4s;
+  position:relative;overflow:hidden;
+}
+.hero .cta::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 25%,rgba(212,168,92,.2) 50%,transparent 75%);
+  transform:translateX(-100%);
+  transition:transform .65s ease;
+}
+.hero .cta:hover::before{transform:translateX(100%)}
+.hero .cta:hover{
+  background:var(--gold);color:var(--ivory);
+  box-shadow:0 0 28px -4px rgba(168,134,75,.45);
+}
+
+/* Hero diagram — outer wrapper for parallax, inner SVG for float */
+.hero-diagram-outer{
+  position:absolute;right:6%;top:50%;
+  width:min(40vw,440px);
+  opacity:0;
+  animation:diagIn 1.1s cubic-bezier(.16,1,.3,1) .45s forwards;
+  transition:transform 1s cubic-bezier(.25,.46,.45,.94);
+  will-change:transform;
+}
+@keyframes diagIn{
+  from{opacity:0;transform:translateY(calc(-50% + 20px))}
+  to{opacity:1;transform:translateY(-50%)}
+}
+.hero-diagram{
+  display:block;width:100%;height:auto;
+  animation:floaty 9s ease-in-out 1.6s infinite alternate;
+}
+@keyframes floaty{from{transform:translateY(-8px)}to{transform:translateY(8px)}}
+@media(max-width:900px){.hero-diagram-outer{display:none}}
+
+/* SVG draw-on paths */
+.hero-diagram .draw{
+  stroke-dasharray:700;stroke-dashoffset:700;
+  animation:drawPath 1.8s cubic-bezier(.4,0,.2,1) forwards;
+}
+.draw-d1{animation-delay:.55s}.draw-d2{animation-delay:.7s}
+.draw-d3{animation-delay:.88s}.draw-d4{animation-delay:1.02s}
+.draw-d5{animation-delay:1.14s}.draw-d6{animation-delay:1.26s}
+.draw-d7{animation-delay:1.38s}.draw-d8{animation-delay:1.5s}
+@keyframes drawPath{to{stroke-dashoffset:0}}
+
+/* Sun pulse rings */
+.hero-diagram .pulse{
+  opacity:0;transform-origin:310px 90px;
+  animation:pulsePing 2.6s ease-out 2s infinite;
+}
+.hero-diagram .pulse2{animation-delay:3.3s}
+@keyframes pulsePing{
+  0%{opacity:.55;transform:scale(.7)}
+  100%{opacity:0;transform:scale(1.7)}
+}
+
+/* Scan line flicker */
+.hero-diagram .scan{
+  stroke-dasharray:5 7;stroke-dashoffset:280;
+  animation:drawPath .9s ease 1.8s forwards,scanFlicker 3.5s ease 2.7s infinite;
+}
+@keyframes scanFlicker{0%,100%{opacity:.45}50%{opacity:.1}}
+
+/* Reveal on scroll */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* Callouts */
+.callout{
+  border-left:3px solid var(--gold);
+  background:linear-gradient(180deg,#fdfaf2,#f8f2e2);
+  padding:1.3rem 1.6rem;
+  margin:1.8rem 0;
+  border-radius:0 8px 8px 0;
+  box-shadow:var(--shadow-soft);
+}
+.callout .label{
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);font-weight:600;margin-bottom:.4rem;
+}
+.callout p:last-child{margin-bottom:0}
+.callout.key{border-color:var(--gold)}
+.callout.why{border-color:var(--rose);background:linear-gradient(180deg,#fdf7f3,#f8ebe3)}
+.callout.why .label{color:var(--rose)}
+.callout.model{border-color:var(--sage);background:linear-gradient(180deg,#f6f8f0,#ecf0df)}
+.callout.model .label{color:var(--sage)}
+.callout.mistake{border-color:#a24a3a;background:#fbf0ec}
+.callout.mistake .label{color:#a24a3a}
+.callout.ts{border-color:#3a6fa0;background:#eef3f9}
+.callout.ts .label{color:#3a6fa0}
+.callout.portfolio{border-color:#7b5a2e;background:linear-gradient(180deg,#fbf5e9,#f2e7cc)}
+.callout.portfolio .label{color:#7b5a2e}
+.callout.exercise{border-color:var(--ink-soft);background:#f3efe5}
+.callout.exercise .label{color:var(--ink)}
+.callout.task{
+  border:1px solid var(--gold);border-left-width:4px;
+  background:linear-gradient(180deg,#fbf6e9,#f4ead0);
+  padding:1.6rem 1.8rem;
+}
+.callout.task .label{color:var(--gold);font-size:.72rem}
+.callout.task h4{margin:.2em 0 .6em;color:var(--ink)}
+
+/* Cards / panels */
+.panel{
+  background:#fffdf7;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:1.8rem 2rem;
+  box-shadow:var(--shadow-soft);
+}
+
+/* TOC */
+.toc{columns:2;column-gap:3rem}
+.toc ol{list-style:none;padding:0;margin:0;counter-reset:c}
+.toc li{counter-increment:c;padding:.55rem 0;border-bottom:1px dotted var(--line);break-inside:avoid}
+.toc li::before{
+  content:counter(c,decimal-leading-zero);
+  color:var(--gold);font-family:'Cormorant Garamond',serif;
+  font-style:italic;margin-right:.8rem;font-size:1.1rem;
+}
+.toc a{color:var(--ink-soft);border:none}
+.toc a:hover{color:var(--gold)}
+@media(max-width:700px){.toc{columns:1}}
+
+/* Chapter header */
+.chap-head{
+  display:flex;align-items:baseline;gap:1.4rem;
+  margin-bottom:1.2rem;padding-bottom:1rem;
+  border-bottom:1px solid var(--line);
+}
+.chap-head .num{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;font-size:2rem;color:var(--gold);
+}
+.chap-head h2{margin:0}
+
+/* Details / collapsible */
+details{
+  background:#fffdf7;border:1px solid var(--line);
+  border-radius:10px;padding:.9rem 1.3rem;margin:.8rem 0;
+  transition:box-shadow .3s;
+}
+details[open]{box-shadow:var(--shadow-soft)}
+details summary{
+  cursor:pointer;font-weight:500;color:var(--ink);
+  list-style:none;display:flex;justify-content:space-between;align-items:center;
+}
+details summary::after{content:"+";color:var(--gold);font-size:1.3rem;transition:transform .3s}
+details[open] summary::after{content:"−"}
+
+/* Diagrams */
+.diagram{
+  margin:2.2rem 0;
+  padding:1.6rem;
+  background:linear-gradient(180deg,#fffdf7,#faf5e8);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow-soft);
+}
+.diagram svg{display:block;width:100%;height:auto;max-width:100%}
+.diagram .caption{
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;color:var(--muted);
+  text-align:center;margin-top:.8rem;font-size:1.05rem;
+}
+
+/* Glossary */
+.glossary dt{font-family:'Cormorant Garamond',serif;font-size:1.3rem;color:var(--ink);margin-top:1.2rem}
+.glossary dd{margin:.2rem 0 0;color:var(--ink-soft)}
+
+/* Footer */
+footer{
+  padding:4rem 0;text-align:center;background:var(--paper);
+  border-top:1px solid var(--line);
+}
+footer p{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--muted)}
+
+/* Utility */
+.lead{font-size:1.15rem;color:var(--ink-soft);max-width:62ch}
+hr.rule{border:none;height:1px;background:var(--line);margin:3rem auto;max-width:200px}
+.tag{display:inline-block;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+
+/* Dark mode variables */
+[data-theme="dark"]{
+  --ivory:#16140f;
+  --paper:#1c1912;
+  --cream:#242016;
+  --ink:#f0e9d8;
+  --ink-soft:#cec4ad;
+  --muted:#8a8070;
+  --line:#2e2a20;
+  --gold:#d4a85c;
+  --gold-soft:#e0bf80;
+  --rose:#d4836a;
+  --sage:#8fa372;
+  --shadow:0 20px 60px -25px rgba(0,0,0,.6);
+  --shadow-soft:0 8px 28px -12px rgba(0,0,0,.5);
+}
+[data-theme="dark"] body{background:var(--ivory);color:var(--ink)}
+[data-theme="dark"] nav.top{background:rgba(22,20,15,.92)}
+[data-theme="dark"] .hero{background:
+  radial-gradient(ellipse at 20% 10%,rgba(168,120,60,.15),transparent 60%),
+  radial-gradient(ellipse at 80% 90%,rgba(160,80,60,.08),transparent 55%),
+  linear-gradient(180deg,var(--ivory),var(--paper))}
+[data-theme="dark"] code{background:var(--cream);color:var(--ink)}
+[data-theme="dark"] pre{background:#0e0c08;color:#e8dfc8}
+[data-theme="dark"] .callout{background:linear-gradient(180deg,#1e1c14,#1a1810)}
+[data-theme="dark"] .callout.why{background:linear-gradient(180deg,#1e1612,#1a110e)}
+[data-theme="dark"] .callout.model{background:linear-gradient(180deg,#151a10,#11160d)}
+[data-theme="dark"] .callout.mistake{background:#1a100e}
+[data-theme="dark"] .callout.ts{background:#0e1520}
+[data-theme="dark"] .callout.portfolio{background:linear-gradient(180deg,#1a1508,#140f05)}
+[data-theme="dark"] .callout.exercise{background:#181510}
+[data-theme="dark"] .callout.task{background:linear-gradient(180deg,#1e1a0c,#18150a)}
+[data-theme="dark"] .panel{background:#1c1912;border-color:var(--line)}
+[data-theme="dark"] details{background:#1c1912;border-color:var(--line)}
+[data-theme="dark"] .diagram{background:linear-gradient(180deg,#1e1c14,#191710)}
+[data-theme="dark"] footer{background:var(--paper)}
+
+/* Scroll progress bar */
+.scroll-bar{
+  position:fixed;top:0;left:0;z-index:100;
+  width:100%;height:3px;
+  background:var(--line);
+  pointer-events:none;
+}
+.scroll-bar__fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--gold),var(--gold-soft));
+  transition:width .08s linear;
+  transform-origin:left;
+}
+
+/* Toggle button */
+.theme-toggle{
+  background:none;border:1px solid var(--line);
+  border-radius:20px;padding:.3rem .75rem;
+  cursor:pointer;font-size:.78rem;color:var(--muted);
+  display:flex;align-items:center;gap:.45rem;
+  transition:color .3s,border-color .3s;
+  font-family:'Inter',sans-serif;
+  flex-shrink:0;
+}
+.theme-toggle:hover{color:var(--gold);border-color:var(--gold)}
+.theme-toggle .icon{font-size:.95rem;line-height:1}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ivory:#16140f;
+    --paper:#1c1912;
+    --cream:#242016;
+    --ink:#f0e9d8;
+    --ink-soft:#cec4ad;
+    --muted:#8a8070;
+    --line:#2e2a20;
+    --gold:#d4a85c;
+    --gold-soft:#e0bf80;
+    --rose:#d4836a;
+    --sage:#8fa372;
+    --shadow:0 20px 60px -25px rgba(0,0,0,.6);
+    --shadow-soft:0 8px 28px -12px rgba(0,0,0,.5);
+  }
+  :root:not([data-theme="light"]) body{background:var(--ivory);color:var(--ink)}
+  :root:not([data-theme="light"]) nav.top{background:rgba(22,20,15,.92)}
+  :root:not([data-theme="light"]) .hero{background:
+    radial-gradient(ellipse at 20% 10%,rgba(168,120,60,.15),transparent 60%),
+    radial-gradient(ellipse at 80% 90%,rgba(160,80,60,.08),transparent 55%),
+    linear-gradient(180deg,var(--ivory),var(--paper))}
+  :root:not([data-theme="light"]) code{background:var(--cream);color:var(--ink)}
+  :root:not([data-theme="light"]) pre{background:#0e0c08;color:#e8dfc8}
+  :root:not([data-theme="light"]) .callout{background:linear-gradient(180deg,#1e1c14,#1a1810)}
+  :root:not([data-theme="light"]) .callout.why{background:linear-gradient(180deg,#1e1612,#1a110e)}
+  :root:not([data-theme="light"]) .callout.model{background:linear-gradient(180deg,#151a10,#11160d)}
+  :root:not([data-theme="light"]) .callout.mistake{background:#1a100e}
+  :root:not([data-theme="light"]) .callout.ts{background:#0e1520}
+  :root:not([data-theme="light"]) .callout.portfolio{background:linear-gradient(180deg,#1a1508,#140f05)}
+  :root:not([data-theme="light"]) .callout.exercise{background:#181510}
+  :root:not([data-theme="light"]) .callout.task{background:linear-gradient(180deg,#1e1a0c,#18150a)}
+  :root:not([data-theme="light"]) .panel{background:#1c1912;border-color:var(--line)}
+  :root:not([data-theme="light"]) details{background:#1c1912;border-color:var(--line)}
+  :root:not([data-theme="light"]) .diagram{background:linear-gradient(180deg,#1e1c14,#191710)}
+  :root:not([data-theme="light"]) footer{background:var(--paper)}
+}
+</style>
+</head>
+<body>
+
+<div class="scroll-bar" role="progressbar" aria-label="Reading progress">
+  <div class="scroll-bar__fill" id="scrollFill"></div>
+</div>
+
+<nav class="top">
+  <div class="wrap">
+    <div class="brand">Book <span>II</span> · R3F</div>
+    <ul>
+      <li><a href="#intro">Intro</a></li>
+      <li><a href="#toc">Contents</a></li>
+      <li><a href="#ch1">Chapters</a></li>
+      <li><a href="#glossary">Glossary</a></li>
+      <li><a href="#capstone">Capstone</a></li>
+    </ul>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+      <span class="icon" id="themeIcon">☀</span>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas id="heroCanvas"></canvas>
+
+  <div class="atmos">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+    <div class="orb c"></div>
+  </div>
+
+  <div class="hero-diagram-outer" id="heroDiagramOuter">
+    <svg class="hero-diagram" viewBox="0 0 400 400" fill="none" stroke="var(--gold)" stroke-width="1.2">
+      <!-- ground grid -->
+      <path class="draw draw-d1" d="M40 300 L200 220 L360 300 L200 380 Z" stroke-opacity=".5"/>
+      <path class="draw draw-d2" d="M120 260 L200 220 L280 260" stroke-opacity=".3"/>
+      <path class="draw draw-d2" d="M120 260 L200 300 L280 260" stroke-opacity=".3"/>
+      <path class="draw draw-d2" d="M200 220 L200 300" stroke-opacity=".3"/>
+      <!-- house -->
+      <path class="draw draw-d3" d="M150 200 L200 170 L250 200 L250 260 L150 260 Z"/>
+      <path class="draw draw-d4" d="M150 200 L200 230 L250 200"/>
+      <path class="draw draw-d5" d="M200 230 L200 260"/>
+      <path class="draw draw-d6" d="M190 260 L190 240 L210 240 L210 260"/>
+      <!-- sun -->
+      <circle class="draw draw-d1" cx="310" cy="90" r="22" stroke="var(--gold-soft)"/>
+      <circle class="pulse" cx="310" cy="90" r="34" stroke="var(--gold-soft)" fill="none" stroke-width=".8"/>
+      <circle class="pulse pulse2" cx="310" cy="90" r="48" stroke="var(--gold-soft)" fill="none" stroke-width=".6"/>
+      <!-- camera -->
+      <path class="draw draw-d7" d="M70 120 L110 100 L110 140 L70 160 Z"/>
+      <path class="draw draw-d7" d="M110 100 L140 110 L140 150 L110 140"/>
+      <line class="scan draw-d8" x1="70" y1="120" x2="200" y2="210" stroke-opacity=".5"/>
+      <!-- axis labels -->
+      <line class="draw draw-d8" x1="28" y1="358" x2="56" y2="358" stroke-opacity=".22" stroke-width=".8"/>
+      <line class="draw draw-d8" x1="28" y1="358" x2="28" y2="330" stroke-opacity=".22" stroke-width=".8"/>
+      <text x="61" y="362" font-size="8" fill="var(--gold)" opacity=".35" font-family="JetBrains Mono,monospace">x</text>
+      <text x="24" y="327" font-size="8" fill="var(--gold)" opacity=".35" font-family="JetBrains Mono,monospace">y</text>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="eyebrow h-enter">Volume II · The Spatial Web</div>
+    <h1 class="h-enter">React Three Fiber<br>for <em>Interactive 3D</em><br>Portfolio Experiences</h1>
+    <p class="sub h-enter">A calm, editorial guide to declarative 3D — from your first Canvas to a living real estate portfolio.</p>
+    <p class="lede h-enter">You already know React. Now you will learn to think in scenes. This book teaches React Three Fiber deeply: the mental models, the architecture, the interaction patterns, and the quiet engineering discipline that turns a 3D toy into a product worth showing.</p>
+    <span class="cta-wrap h-enter"><a href="#intro" class="cta">Begin Reading</a></span>
+  </div>
+</header>
+
+<!-- INTRODUCTION -->
+<section id="intro">
+  <div class="wrap">
+    <span class="tag">Introduction</span>
+    <h2>Welcome to the second volume</h2>
+    <p class="lead">Book I gave you the React foundations. This book is about a different kind of thinking. In traditional React, you describe UI as a tree of components. In React Three Fiber, you describe <em>space</em> — lights, geometry, cameras, and the invisible relationships that bind them. The same declarative muscle you built in Book I carries over, but the stage is wider.</p>
+    <p>Our destination is concrete: an interactive real estate portfolio where a visitor can orbit a property, click hotspots, walk through rooms, and feel that a human craftsperson put this together. Everything in this book points toward that final artifact.</p>
+
+    <div class="callout key">
+      <div class="label">Key Idea</div>
+      <p>React Three Fiber is not a new framework to memorize. It is React, rendering into a 3D scene graph instead of a DOM tree. Once that clicks, everything else follows.</p>
+    </div>
+
+    <h3 id="howto">How to use this book</h3>
+    <p>Read chapters in order at least once. Each chapter is short by design — long enough to plant a concept, short enough to finish in a sitting. After each chapter you will find exercises and a chapter task. The exercises rehearse a single idea; the tasks push a small piece of the real estate portfolio forward. By the final chapter, you will not just understand R3F — you will have built something.</p>
+
+    <h3 id="roadmap">Learning roadmap</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10 z" fill="#a8864b"/>
+          </marker>
+        </defs>
+        <g font-family="Cormorant Garamond, serif" font-size="16" fill="#1d1a15">
+          <g>
+            <circle cx="80" cy="130" r="42" fill="#fbf6e9" stroke="#a8864b"/>
+            <text x="80" y="128" text-anchor="middle" font-style="italic">Foundations</text>
+            <text x="80" y="148" text-anchor="middle" font-size="11" fill="#6b6256">Ch 1–3</text>
+          </g>
+          <g>
+            <circle cx="260" cy="130" r="42" fill="#fbf6e9" stroke="#a8864b"/>
+            <text x="260" y="128" text-anchor="middle" font-style="italic">Scene Craft</text>
+            <text x="260" y="148" text-anchor="middle" font-size="11" fill="#6b6256">Ch 4–6</text>
+          </g>
+          <g>
+            <circle cx="440" cy="130" r="42" fill="#fbf6e9" stroke="#a8864b"/>
+            <text x="440" y="128" text-anchor="middle" font-style="italic">Motion</text>
+            <text x="440" y="148" text-anchor="middle" font-size="11" fill="#6b6256">Ch 7–9</text>
+          </g>
+          <g>
+            <circle cx="620" cy="130" r="42" fill="#fbf6e9" stroke="#a8864b"/>
+            <text x="620" y="128" text-anchor="middle" font-style="italic">Systems</text>
+            <text x="620" y="148" text-anchor="middle" font-size="11" fill="#6b6256">Ch 10–12</text>
+          </g>
+          <g>
+            <circle cx="800" cy="130" r="50" fill="#f2e7cc" stroke="#7b5a2e" stroke-width="2"/>
+            <text x="800" y="128" text-anchor="middle" font-style="italic">Capstone</text>
+            <text x="800" y="148" text-anchor="middle" font-size="11" fill="#6b6256">Portfolio</text>
+          </g>
+          <line x1="122" y1="130" x2="218" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+          <line x1="302" y1="130" x2="398" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+          <line x1="482" y1="130" x2="578" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+          <line x1="662" y1="130" x2="750" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 0.1 — The arc of the book, from first Canvas to a living portfolio.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOC -->
+<section id="toc">
+  <div class="wrap">
+    <span class="tag">Contents</span>
+    <h2>Detailed table of contents</h2>
+    <div class="panel toc">
+      <ol>
+        <li><a href="#ch1">What React Three Fiber Actually Is</a></li>
+        <li><a href="#ch2">The Canvas and the Scene Graph</a></li>
+        <li><a href="#ch3">Meshes, Geometry, and Materials</a></li>
+        <li><a href="#ch4">Lights, Cameras, and Atmosphere</a></li>
+        <li><a href="#ch5">Transforms and Coordinate Space</a></li>
+        <li><a href="#ch6">Groups and Composition</a></li>
+        <li><a href="#ch7">Refs in 3D</a></li>
+        <li><a href="#ch8">The Frame Loop and Animation</a></li>
+        <li><a href="#ch9">Interaction, Events, and Hotspots</a></li>
+        <li><a href="#ch10">Controls and Navigation</a></li>
+        <li><a href="#ch11">Loading Models and Assets</a></li>
+        <li><a href="#ch12">Reusable Scene Systems and Architecture</a></li>
+        <li><a href="#ch13">Debugging in Three Dimensions</a></li>
+        <li><a href="#ch14">The Performance Mindset</a></li>
+        <li><a href="#capstone">Capstone — The Real Estate Portfolio</a></li>
+        <li><a href="#glossary">Glossary</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- CH 1 -->
+<section id="ch1">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">I</span><h2>What React Three Fiber Actually Is</h2></div>
+    <p class="lead">Before anything technical, a short story. Three.js is a beautiful, powerful library — but writing it imperatively means saying, step by step: create this mesh, add it to the scene, set its position, update it every frame. React Three Fiber (R3F) lets you describe the same scene the way you describe a React UI: as a tree of components, re-rendered when state changes. The imperative work still happens — R3F does it for you.</p>
+
+    <div class="callout model">
+      <div class="label">Mental Model</div>
+      <p>If React renders components into the DOM, R3F renders components into a Three.js scene graph. The JSX tag <code>&lt;mesh&gt;</code> becomes an actual <code>THREE.Mesh</code>. Props become method calls. Unmounting disposes. You already know the rules — only the target changed.</p>
+    </div>
+
+    <h3>Three.js in one paragraph</h3>
+    <p>Three.js wraps WebGL so you can talk about <em>objects</em> instead of <em>triangles</em>. A scene contains objects. Objects have geometry (shape) and material (surface). A camera defines a point of view. A renderer draws the whole thing to a canvas each frame. R3F does not hide Three.js — it gives you declarative access to every bit of it.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 260">
+        <g font-family="Cormorant Garamond, serif" font-size="15" fill="#1d1a15">
+          <rect x="30" y="60" width="200" height="140" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="130" y="95" text-anchor="middle" font-size="18" font-style="italic">Your React Code</text>
+          <text x="130" y="125" text-anchor="middle" font-size="12" fill="#6b6256">&lt;Canvas&gt;</text>
+          <text x="130" y="145" text-anchor="middle" font-size="12" fill="#6b6256">&lt;mesh /&gt;</text>
+          <text x="130" y="165" text-anchor="middle" font-size="12" fill="#6b6256">useFrame(...)</text>
+
+          <rect x="310" y="60" width="200" height="140" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="410" y="95" text-anchor="middle" font-size="18" font-style="italic">React Three Fiber</text>
+          <text x="410" y="125" text-anchor="middle" font-size="12" fill="#6b6256">reconciler</text>
+          <text x="410" y="145" text-anchor="middle" font-size="12" fill="#6b6256">diff → scene ops</text>
+          <text x="410" y="165" text-anchor="middle" font-size="12" fill="#6b6256">frame scheduling</text>
+
+          <rect x="590" y="60" width="200" height="140" rx="10" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="690" y="95" text-anchor="middle" font-size="18" font-style="italic">Three.js + WebGL</text>
+          <text x="690" y="125" text-anchor="middle" font-size="12" fill="#6b6256">THREE.Scene</text>
+          <text x="690" y="145" text-anchor="middle" font-size="12" fill="#6b6256">THREE.Mesh</text>
+          <text x="690" y="165" text-anchor="middle" font-size="12" fill="#6b6256">GPU draw calls</text>
+
+          <line x1="230" y1="130" x2="305" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+          <line x1="510" y1="130" x2="585" y2="130" stroke="#a8864b" marker-end="url(#arr)"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 1.1 — R3F sits between your declarative code and the imperative Three.js world.</div>
+    </div>
+
+    <div class="callout why">
+      <div class="label">Why It Matters</div>
+      <p>Declarative 3D is not just stylistic. It means state drives the scene. Change a prop and the scene changes — no manual cleanup, no forgotten listeners, no stale references. For a portfolio that must respond to user choices (floor plan, lighting mode, selected room), this is decisive.</p>
+    </div>
+
+    <h3>Your first scene</h3>
+<pre><code>import { Canvas } from '@react-three/fiber'
+
+export default function App() {
+  return (
+    &lt;Canvas camera={{ position: [3, 3, 5] }}&gt;
+      &lt;ambientLight intensity={0.4} /&gt;
+      &lt;directionalLight position={[5, 5, 5]} /&gt;
+      &lt;mesh&gt;
+        &lt;boxGeometry args={[1, 1, 1]} /&gt;
+        &lt;meshStandardMaterial color="#c9a866" /&gt;
+      &lt;/mesh&gt;
+    &lt;/Canvas&gt;
+  )
+}</code></pre>
+
+    <p>Read it as a sentence. A canvas, with a camera placed in space, containing soft ambient light and a strong directional light, and a single mesh whose shape is a box and whose surface is a muted gold. There is no <code>new THREE.Mesh</code>, no <code>scene.add</code>. The JSX <em>is</em> the scene description.</p>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Treating R3F like the DOM. A <code>&lt;mesh&gt;</code> is not a <code>&lt;div&gt;</code>. It cannot contain text nodes or arbitrary HTML. It contains geometry, material, and other 3D children. Mixing the two worlds is the first source of confusion — and the first source of clarity when you stop.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 1.1</div>
+      <p>In a fresh Vite project, install <code>three</code> and <code>@react-three/fiber</code>. Render a single cube. Change its color. Change its position by editing the <code>position</code> prop on the mesh. Notice: you never touched Three.js directly.</p>
+    </div>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>Your entire portfolio will live inside a single <code>&lt;Canvas&gt;</code>. Every room, every hotspot, every camera angle is just a component. The discipline you build in this chapter — thinking of a scene as a tree — is the same discipline that will let you drop a new property into the portfolio without touching a single line of rendering code.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Project stub</h4>
+      <p>Create a folder called <code>portfolio/</code>. Inside it, build a minimal R3F app that shows a single box on an empty canvas. Commit it. This is the seed of everything that follows.</p>
+    </div>
+
+    <details><summary>Chapter 1 recap</summary><p>R3F is React rendering into Three.js. JSX tags map to Three.js objects. Props become configuration. The mental model is: state drives scene.</p></details>
+    <details><summary>Reflection questions</summary><p>Why is declarative 3D easier to maintain than imperative 3D? What React concept does <code>&lt;mesh&gt;</code> most closely resemble, and why is that comparison incomplete?</p></details>
+  </div>
+</section>
+
+<!-- CH 2 -->
+<section id="ch2">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">II</span><h2>The Canvas and the Scene Graph</h2></div>
+    <p class="lead">The <code>&lt;Canvas&gt;</code> component is the entire world in a box. It creates a renderer, a scene, and a default camera, then hands you a React tree to populate it. Everything you build in this book lives inside it.</p>
+
+    <h3>What Canvas does for you</h3>
+    <p>A plain Three.js app requires you to manually set up a WebGL renderer, attach it to a DOM element, create a scene, create a camera, handle resizing, and start a render loop. Canvas does all of that, and keeps doing it as the window changes. You think about the scene; Canvas thinks about the plumbing.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 320">
+        <g font-family="Cormorant Garamond, serif" font-size="14" fill="#1d1a15">
+          <rect x="30" y="30" width="760" height="260" rx="12" fill="#fffdf7" stroke="#a8864b" stroke-dasharray="4 4"/>
+          <text x="50" y="55" font-size="18" font-style="italic" fill="#a8864b">&lt;Canvas&gt;</text>
+
+          <rect x="70" y="80" width="160" height="60" rx="8" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="150" y="115" text-anchor="middle" font-style="italic">Scene (root)</text>
+
+          <rect x="280" y="80" width="160" height="60" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="360" y="115" text-anchor="middle" font-style="italic">Camera</text>
+
+          <rect x="490" y="80" width="160" height="60" rx="8" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="570" y="115" text-anchor="middle" font-style="italic">Renderer</text>
+
+          <rect x="70" y="180" width="110" height="50" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="125" y="210" text-anchor="middle">&lt;group&gt;</text>
+
+          <rect x="210" y="180" width="110" height="50" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="265" y="210" text-anchor="middle">&lt;mesh&gt;</text>
+
+          <rect x="350" y="180" width="130" height="50" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="415" y="210" text-anchor="middle">&lt;directionalLight&gt;</text>
+
+          <rect x="510" y="180" width="140" height="50" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="580" y="210" text-anchor="middle">&lt;ambientLight&gt;</text>
+
+          <line x1="150" y1="140" x2="125" y2="180" stroke="#a8864b"/>
+          <line x1="150" y1="140" x2="265" y2="180" stroke="#a8864b"/>
+          <line x1="150" y1="140" x2="415" y2="180" stroke="#a8864b"/>
+          <line x1="150" y1="140" x2="580" y2="180" stroke="#a8864b"/>
+
+          <rect x="70" y="250" width="110" height="30" rx="6" fill="#f3efe5" stroke="#6b6256"/>
+          <text x="125" y="270" text-anchor="middle" font-size="12">&lt;mesh&gt;</text>
+          <line x1="125" y1="230" x2="125" y2="250" stroke="#a8864b"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 2.1 — The scene graph: a tree rooted at the scene, where every node has a parent transform.</div>
+    </div>
+
+    <div class="callout key">
+      <div class="label">Key Idea</div>
+      <p>A scene graph is a tree of objects where each child inherits its parent's position, rotation, and scale. Move the parent and the children move with it. This single property is the secret engine of composition in 3D.</p>
+    </div>
+
+    <h3>Configuring the Canvas</h3>
+<pre><code>&lt;Canvas
+  shadows
+  dpr={[1, 2]}
+  camera={{ position: [4, 3, 6], fov: 45 }}
+  gl={{ antialias: true, alpha: false }}
+&gt;
+  { /* scene */ }
+&lt;/Canvas&gt;</code></pre>
+
+    <p>Three flags worth knowing early: <code>shadows</code> enables shadow mapping, <code>dpr</code> clamps device pixel ratio (critical for retina displays and performance), and <code>camera</code> overrides the default camera. You will tune these as your portfolio matures.</p>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Putting the <code>&lt;Canvas&gt;</code> inside a container with no explicit height. The canvas fills its parent — if the parent is zero pixels tall, so is your scene. Always give the wrapper a defined height (e.g. <code>100vh</code>).</p>
+    </div>
+
+    <div class="callout ts">
+      <div class="label">TypeScript Tip</div>
+      <p>R3F ships its own types for JSX intrinsics. <code>&lt;mesh&gt;</code>, <code>&lt;group&gt;</code>, and friends are all typed. If autocomplete fails, import <code>@react-three/fiber</code> once at the top of your entry file — the module augments the JSX namespace on import.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 2.1</div>
+      <p>Wrap three meshes in a <code>&lt;group&gt;</code>. Move the group. Confirm all three move together. Rotate the group. Confirm the children orbit the group origin, not their own.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Portfolio canvas shell</h4>
+      <p>Replace your stub with a proper Canvas that fills the viewport, enables shadows, and places the camera at <code>[6, 4, 8]</code> looking at the origin. Add a ground plane (<code>&lt;mesh rotation-x={-Math.PI/2}&gt;</code>) and a placeholder box where a building will later stand.</p>
+    </div>
+
+    <details><summary>Recap</summary><p>Canvas is the world. The scene graph is a tree. Children inherit parent transforms. Always give Canvas a sized parent.</p></details>
+  </div>
+</section>
+
+<!-- CH 3 -->
+<section id="ch3">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">III</span><h2>Meshes, Geometry, and Materials</h2></div>
+    <p class="lead">Every visible thing in a 3D scene is a mesh. A mesh is made of two parts: <em>geometry</em>, which is the shape (vertices and faces), and <em>material</em>, which is how the surface responds to light. Learning to separate these two in your head is half of becoming fluent in 3D.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 220">
+        <g font-family="Cormorant Garamond, serif" font-size="14" fill="#1d1a15">
+          <rect x="40" y="60" width="160" height="100" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="120" y="100" text-anchor="middle" font-size="18" font-style="italic">Geometry</text>
+          <text x="120" y="125" text-anchor="middle" font-size="12" fill="#6b6256">vertices, faces</text>
+          <text x="120" y="142" text-anchor="middle" font-size="12" fill="#6b6256">"the shape"</text>
+
+          <text x="250" y="115" text-anchor="middle" font-size="32" fill="#a8864b">+</text>
+
+          <rect x="290" y="60" width="160" height="100" rx="10" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="370" y="100" text-anchor="middle" font-size="18" font-style="italic">Material</text>
+          <text x="370" y="125" text-anchor="middle" font-size="12" fill="#6b6256">color, roughness</text>
+          <text x="370" y="142" text-anchor="middle" font-size="12" fill="#6b6256">"the surface"</text>
+
+          <text x="500" y="115" text-anchor="middle" font-size="32" fill="#a8864b">=</text>
+
+          <rect x="540" y="60" width="130" height="100" rx="10" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="605" y="100" text-anchor="middle" font-size="18" font-style="italic">Mesh</text>
+          <text x="605" y="125" text-anchor="middle" font-size="12" fill="#6b6256">visible object</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 3.1 — A mesh is geometry plus material. Swap either one and the mesh transforms.</div>
+    </div>
+
+    <h3>Built-in geometries</h3>
+    <p>R3F exposes every Three.js primitive as a JSX tag: <code>boxGeometry</code>, <code>sphereGeometry</code>, <code>planeGeometry</code>, <code>cylinderGeometry</code>, <code>torusGeometry</code>, and more. You will use these constantly for prototyping — a box for a wall, a plane for a floor, a cylinder for a column.</p>
+
+    <h3>Standard material, in plain English</h3>
+    <p><code>meshStandardMaterial</code> is the default workhorse. It is <em>physically based</em>, meaning its behavior mimics how real surfaces respond to light. Three props matter most at the start: <code>color</code> (the base hue), <code>roughness</code> (0 = mirror, 1 = chalk), and <code>metalness</code> (0 = dielectric, 1 = metal). A good architectural wall: off-white color, roughness around 0.9, metalness 0.</p>
+
+<pre><code>&lt;mesh position={[0, 1, 0]}&gt;
+  &lt;boxGeometry args={[2, 2, 2]} /&gt;
+  &lt;meshStandardMaterial
+    color="#f3ead4"
+    roughness={0.9}
+    metalness={0}
+  /&gt;
+&lt;/mesh&gt;</code></pre>
+
+    <div class="callout why">
+      <div class="label">Why It Matters</div>
+      <p>Real estate visualization lives and dies on material realism. A "correct" wall with wrong roughness reads as plastic. Learning to <em>feel</em> the difference between 0.6 and 0.9 roughness is a genuine professional skill.</p>
+    </div>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Using <code>meshBasicMaterial</code> and wondering why your lights do nothing. Basic materials ignore lighting entirely — they are flat color. Use them for UI helpers, not for surfaces you want to feel real.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 3.1</div>
+      <p>Make a row of five spheres with identical color but roughness values of 0, 0.25, 0.5, 0.75, and 1. Add a single directional light. Study the difference. Which looks most like polished marble? Which looks most like matte plaster?</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Blocky building</h4>
+      <p>Replace your placeholder box with a rough blocked-out building: four walls (thin boxes), a ground slab, and a roof slab. Use standard material throughout. Do not worry about beauty yet — worry about structure.</p>
+    </div>
+    <details><summary>Recap</summary><p>Mesh = geometry + material. Standard material is the default. Roughness and metalness define surface feel.</p></details>
+  </div>
+</section>
+
+<!-- CH 4 -->
+<section id="ch4">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">IV</span><h2>Lights, Cameras, and Atmosphere</h2></div>
+    <p class="lead">A scene without lighting thought is a scene that feels like cardboard. In 3D, lighting is not decoration — it <em>is</em> the mood. You are not choosing bulbs, you are choosing a feeling.</p>
+
+    <h3>The four lights you will actually use</h3>
+    <p><strong>Ambient light</strong> adds uniform illumination everywhere; it prevents shadows from being pure black. <strong>Directional light</strong> simulates the sun — parallel rays from one direction, and the only light that casts efficient shadows. <strong>Point light</strong> radiates from a point, like a lamp. <strong>Spot light</strong> casts a cone, like a flashlight or a gallery accent.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 260">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <g transform="translate(40,30)">
+            <rect width="160" height="200" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-style="italic">Ambient</text>
+            <circle cx="80" cy="110" r="35" fill="#fbf6e9" stroke="#a8864b" stroke-dasharray="2 2"/>
+            <text x="80" y="180" text-anchor="middle" font-size="11" fill="#6b6256">fills shadows</text>
+          </g>
+          <g transform="translate(220,30)">
+            <rect width="160" height="200" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-style="italic">Directional</text>
+            <circle cx="30" cy="60" r="12" fill="#c9a866"/>
+            <line x1="45" y1="70" x2="120" y2="140" stroke="#a8864b"/>
+            <line x1="45" y1="85" x2="120" y2="155" stroke="#a8864b"/>
+            <line x1="45" y1="100" x2="120" y2="170" stroke="#a8864b"/>
+            <text x="80" y="195" text-anchor="middle" font-size="11" fill="#6b6256">the sun</text>
+          </g>
+          <g transform="translate(400,30)">
+            <rect width="160" height="200" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-style="italic">Point</text>
+            <circle cx="80" cy="100" r="8" fill="#c9a866"/>
+            <circle cx="80" cy="100" r="25" fill="none" stroke="#c9a866" stroke-opacity=".5"/>
+            <circle cx="80" cy="100" r="45" fill="none" stroke="#c9a866" stroke-opacity=".25"/>
+            <text x="80" y="195" text-anchor="middle" font-size="11" fill="#6b6256">a lamp</text>
+          </g>
+          <g transform="translate(580,30)">
+            <rect width="160" height="200" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="80" y="30" text-anchor="middle" font-size="16" font-style="italic">Spot</text>
+            <circle cx="80" cy="55" r="8" fill="#c9a866"/>
+            <path d="M80 60 L50 170 L110 170 Z" fill="#c9a866" fill-opacity=".25" stroke="#a8864b"/>
+            <text x="80" y="195" text-anchor="middle" font-size="11" fill="#6b6256">an accent</text>
+          </g>
+        </g>
+      </svg>
+      <div class="caption">Fig. 4.1 — The four lights, each with a different physical metaphor.</div>
+    </div>
+
+    <div class="callout model">
+      <div class="label">Mental Model</div>
+      <p>Think like a film director. You rarely want one light. You want a <em>key</em> (main, usually directional), a <em>fill</em> (softer, ambient or low point), and maybe a <em>rim</em> (a spot from behind). Two or three well-placed lights beat ten random ones.</p>
+    </div>
+
+    <h3>Cameras</h3>
+    <p>Two cameras matter: <code>PerspectiveCamera</code> (the default — objects farther away look smaller, as in real life) and <code>OrthographicCamera</code> (no perspective distortion — useful for architectural plans and isometric views). For a real estate walkthrough you almost always want perspective. For a floor plan overview, orthographic reads more technical and honest.</p>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>Plan three signature lighting moods for your portfolio: <em>morning</em> (warm directional from low angle, cool ambient), <em>midday</em> (white directional from high angle, neutral ambient), <em>evening</em> (orange-red directional, blue ambient, warm point lights inside). A single "time of day" toggle can swap between them.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 4.1</div>
+      <p>Build your three-light rig: a low-intensity ambient, a strong directional (cast shadows enabled), and a point light inside the building. Then remove each one in turn and observe what it was contributing.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Atmosphere pass</h4>
+      <p>Add the three-light rig and enable shadows on both the directional light and the building meshes (<code>castShadow</code>, <code>receiveShadow</code>). Your blocky building should now have a soft shadow on the ground.</p>
+    </div>
+    <details><summary>Recap</summary><p>Ambient fills, directional acts as sun, point is a lamp, spot is an accent. Cameras are either perspective (realistic) or orthographic (technical).</p></details>
+  </div>
+</section>
+
+<!-- CH 5 -->
+<section id="ch5">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">V</span><h2>Transforms and Coordinate Space</h2></div>
+    <p class="lead">Every object in a 3D scene has three transforms: <em>position</em>, <em>rotation</em>, and <em>scale</em>. Understanding how these combine — and how they nest inside groups — is the difference between fighting the scene and flowing with it.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 600 320">
+        <g font-family="Cormorant Garamond, serif" font-size="14" fill="#1d1a15">
+          <line x1="300" y1="280" x2="300" y2="40" stroke="#6a7a55" stroke-width="1.5"/>
+          <text x="310" y="50" fill="#6a7a55">+Y up</text>
+          <line x1="60" y1="280" x2="540" y2="280" stroke="#a24a3a" stroke-width="1.5"/>
+          <text x="520" y="270" fill="#a24a3a">+X right</text>
+          <line x1="300" y1="280" x2="140" y2="200" stroke="#3a6fa0" stroke-width="1.5"/>
+          <text x="110" y="195" fill="#3a6fa0">+Z toward viewer</text>
+          <circle cx="300" cy="280" r="4" fill="#1d1a15"/>
+          <text x="306" y="298" font-size="12" fill="#6b6256">origin (0,0,0)</text>
+          <rect x="360" y="200" width="50" height="80" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="385" y="195" text-anchor="middle" font-size="11" fill="#6b6256">position: [2, 1, 0]</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 5.1 — The right-handed coordinate system R3F uses. +Y is up, +Z comes toward you.</div>
+    </div>
+
+    <h3>Position</h3>
+    <p>Position is a three-number array <code>[x, y, z]</code>. R3F also accepts dash-prop shortcuts: <code>position-x={2}</code>. Rotation uses radians. Scale is either a single number (uniform) or an array.</p>
+
+<pre><code>&lt;mesh
+  position={[2, 1, 0]}
+  rotation={[0, Math.PI / 4, 0]}
+  scale={[1, 2, 1]}
+/&gt;</code></pre>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Using degrees instead of radians. Three.js — and therefore R3F — always works in radians. Convert with <code>THREE.MathUtils.degToRad(45)</code> or memorize that <code>Math.PI</code> is 180°.</p>
+    </div>
+
+    <h3>Local vs world space</h3>
+    <p>A child's position is relative to its parent. If you put a mesh at <code>[1, 0, 0]</code> inside a group positioned at <code>[5, 0, 0]</code>, the mesh ends up at world position <code>[6, 0, 0]</code>. This is why groups are so powerful: move the parent, and everything inside moves together without recalculation.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 240">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="60" y="60" width="260" height="140" rx="10" fill="#fffdf7" stroke="#a8864b" stroke-dasharray="4 4"/>
+          <text x="80" y="85" font-style="italic" fill="#a8864b">Group at [5, 0, 0]</text>
+          <circle cx="140" cy="140" r="14" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="140" y="170" text-anchor="middle" font-size="11">child [1,0,0]</text>
+          <circle cx="240" cy="140" r="14" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="240" y="170" text-anchor="middle" font-size="11">child [2,0,0]</text>
+
+          <text x="380" y="140" font-size="28" fill="#a8864b">→</text>
+
+          <rect x="430" y="60" width="240" height="140" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="450" y="85" font-style="italic" fill="#6a7a55">World</text>
+          <circle cx="500" cy="140" r="14" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="500" y="170" text-anchor="middle" font-size="11">at [6,0,0]</text>
+          <circle cx="600" cy="140" r="14" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="600" y="170" text-anchor="middle" font-size="11">at [7,0,0]</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 5.2 — Local transforms inside a group add to the group's transform to produce world position.</div>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 5.1</div>
+      <p>Place three small spheres inside a group at local positions <code>[-1,0,0]</code>, <code>[0,0,0]</code>, <code>[1,0,0]</code>. Rotate the group by <code>Math.PI/2</code> around Y. Predict, then verify, the new world positions.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Group the building</h4>
+      <p>Wrap all the meshes of your blocky building in a single <code>&lt;group&gt;</code>. Move the group to a new position. Confirm the whole building moves as one unit. This group is the seed of your reusable Building component.</p>
+    </div>
+    <details><summary>Recap</summary><p>Transforms are position, rotation (radians), scale. Children inherit parent transforms. Groups are the primary composition tool.</p></details>
+  </div>
+</section>
+
+<!-- CH 6 -->
+<section id="ch6">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">VI</span><h2>Groups and Composition</h2></div>
+    <p class="lead">In React you make small components and compose them. In R3F you do exactly the same — you just compose <em>spatial</em> components. The group is your composition atom.</p>
+
+    <h3>Why components matter more in 3D</h3>
+    <p>A real estate portfolio scene can easily contain thousands of objects. Without composition you will drown. With composition, you think in terms of <code>&lt;Building&gt;</code>, <code>&lt;Room&gt;</code>, <code>&lt;Furniture&gt;</code>, <code>&lt;Hotspot&gt;</code>. Each component owns its own geometry, materials, and internal structure. The parent never has to know.</p>
+
+<pre><code>function Column({ position }) {
+  return (
+    &lt;group position={position}&gt;
+      &lt;mesh position={[0, 1.5, 0]}&gt;
+        &lt;cylinderGeometry args={[0.2, 0.2, 3]} /&gt;
+        &lt;meshStandardMaterial color="#ece0c4" roughness={0.9} /&gt;
+      &lt;/mesh&gt;
+      &lt;mesh position={[0, 3.05, 0]}&gt;
+        &lt;boxGeometry args={[0.6, 0.1, 0.6]} /&gt;
+        &lt;meshStandardMaterial color="#d9c99a" /&gt;
+      &lt;/mesh&gt;
+    &lt;/group&gt;
+  )
+}</code></pre>
+
+    <div class="callout key">
+      <div class="label">Key Idea</div>
+      <p>A reusable 3D component is just a React function that returns a group. Props become position, rotation, color, variant. Everything you learned about React component design applies.</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 280">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="320" y="20" width="160" height="50" rx="8" fill="#f2e7cc" stroke="#7b5a2e" stroke-width="2"/>
+          <text x="400" y="50" text-anchor="middle" font-style="italic" font-size="16">&lt;Property&gt;</text>
+
+          <rect x="100" y="110" width="140" height="45" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="170" y="138" text-anchor="middle">&lt;Building&gt;</text>
+          <rect x="260" y="110" width="140" height="45" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="330" y="138" text-anchor="middle">&lt;Landscape&gt;</text>
+          <rect x="420" y="110" width="140" height="45" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="490" y="138" text-anchor="middle">&lt;Hotspots&gt;</text>
+          <rect x="580" y="110" width="140" height="45" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="650" y="138" text-anchor="middle">&lt;Lighting&gt;</text>
+
+          <rect x="60" y="200" width="100" height="40" rx="6" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="110" y="224" text-anchor="middle" font-size="12">&lt;Room×4&gt;</text>
+          <rect x="180" y="200" width="100" height="40" rx="6" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="230" y="224" text-anchor="middle" font-size="12">&lt;Roof&gt;</text>
+
+          <line x1="400" y1="70" x2="170" y2="110" stroke="#a8864b"/>
+          <line x1="400" y1="70" x2="330" y2="110" stroke="#a8864b"/>
+          <line x1="400" y1="70" x2="490" y2="110" stroke="#a8864b"/>
+          <line x1="400" y1="70" x2="650" y2="110" stroke="#a8864b"/>
+          <line x1="170" y1="155" x2="110" y2="200" stroke="#a8864b"/>
+          <line x1="170" y1="155" x2="230" y2="200" stroke="#a8864b"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 6.1 — A property decomposed into named, reusable components.</div>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 6.1</div>
+      <p>Extract your wall meshes into a <code>&lt;Wall&gt;</code> component that takes <code>position</code>, <code>rotation</code>, and <code>width</code> as props. Render four walls using it.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Building component</h4>
+      <p>Refactor your entire blocky building into a <code>&lt;Building&gt;</code> component that accepts a <code>position</code> prop. Place two buildings in your scene to prove reusability.</p>
+    </div>
+    <details><summary>Recap</summary><p>Groups enable spatial composition. Reusable 3D components are functions returning groups. React discipline equals scene discipline.</p></details>
+  </div>
+</section>
+
+<!-- CH 7 -->
+<section id="ch7">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">VII</span><h2>Refs in 3D</h2></div>
+    <p class="lead">React refs let you reach into a DOM element when the declarative model is not enough. In R3F, refs let you reach into a Three.js object. They are your escape hatch to imperative behavior — rotation, animation, direct manipulation — without leaving the React paradigm.</p>
+
+<pre><code>import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
+
+function SpinningCube() {
+  const ref = useRef&lt;THREE.Mesh&gt;(null!)
+  useFrame((_, dt) =&gt; {
+    if (ref.current) ref.current.rotation.y += dt
+  })
+  return (
+    &lt;mesh ref={ref}&gt;
+      &lt;boxGeometry /&gt;
+      &lt;meshStandardMaterial color="#c9a866" /&gt;
+    &lt;/mesh&gt;
+  )
+}</code></pre>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 220">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="40" y="60" width="180" height="100" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="130" y="100" text-anchor="middle" font-size="16" font-style="italic">React component</text>
+          <text x="130" y="125" text-anchor="middle" font-size="11" fill="#6b6256">useRef() → ref</text>
+
+          <line x1="220" y1="110" x2="295" y2="110" stroke="#a8864b" marker-end="url(#arr)"/>
+          <text x="258" y="100" text-anchor="middle" font-size="11" fill="#6b6256">attach</text>
+
+          <rect x="300" y="60" width="180" height="100" rx="10" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="390" y="100" text-anchor="middle" font-size="16" font-style="italic">&lt;mesh ref={'{ref}'}&gt;</text>
+          <text x="390" y="125" text-anchor="middle" font-size="11" fill="#6b6256">THREE.Mesh instance</text>
+
+          <line x1="480" y1="110" x2="555" y2="110" stroke="#a8864b" marker-end="url(#arr)"/>
+          <text x="518" y="100" text-anchor="middle" font-size="11" fill="#6b6256">mutate</text>
+
+          <rect x="560" y="60" width="120" height="100" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="620" y="100" text-anchor="middle" font-size="14" font-style="italic">rotation.y</text>
+          <text x="620" y="125" text-anchor="middle" font-size="11" fill="#6b6256">per frame</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 7.1 — A ref connects the React world to a live Three.js object, which you then mutate directly.</div>
+    </div>
+
+    <div class="callout why">
+      <div class="label">Why It Matters</div>
+      <p>Setting React state 60 times a second is slow and wasteful. Refs let you animate without re-rendering. This is the single most important performance pattern in R3F.</p>
+    </div>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Using <code>useState</code> for per-frame values (rotation, position during animation). Always use refs for continuous values. Reserve state for discrete changes a user can see — selection, mode, filters.</p>
+    </div>
+
+    <div class="callout ts">
+      <div class="label">TypeScript Tip</div>
+      <p>Type your refs precisely: <code>useRef&lt;THREE.Mesh&gt;(null!)</code> for a mesh, <code>useRef&lt;THREE.Group&gt;(null!)</code> for a group. The <code>null!</code> pattern asserts that the ref will be attached before use.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 7.1</div>
+      <p>Create a floating sphere that gently bobs up and down using <code>ref.current.position.y = Math.sin(t)</code>. Compare performance with a version using <code>useState</code> — the ref version should not re-render at all.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Subtle building breathe</h4>
+      <p>Give your building group a ref and, via <code>useFrame</code>, make it rotate one-tenth of a radian per second. We will replace this with real camera movement later, but for now it proves your ref plumbing works.</p>
+    </div>
+    <details><summary>Recap</summary><p>Refs are the imperative escape hatch. Mutate Three.js objects through refs for per-frame work. Reserve state for user-facing discrete changes.</p></details>
+  </div>
+</section>
+
+<!-- CH 8 -->
+<section id="ch8">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">VIII</span><h2>The Frame Loop and Animation</h2></div>
+    <p class="lead">R3F renders a frame roughly every 16 milliseconds. The hook <code>useFrame</code> lets you hook into that loop. Every animation, camera movement, shader update, or physics step happens here.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 260">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <circle cx="410" cy="130" r="90" fill="none" stroke="#a8864b" stroke-width="1.5"/>
+          <text x="410" y="135" text-anchor="middle" font-size="18" font-style="italic">Frame Loop</text>
+          <text x="410" y="155" text-anchor="middle" font-size="11" fill="#6b6256">~60fps</text>
+
+          <g>
+            <rect x="40" y="40" width="180" height="45" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="130" y="67" text-anchor="middle">1. useFrame callbacks</text>
+            <line x1="220" y1="62" x2="320" y2="90" stroke="#a8864b" marker-end="url(#arr)"/>
+          </g>
+          <g>
+            <rect x="600" y="40" width="180" height="45" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="690" y="67" text-anchor="middle">2. Scene updates</text>
+            <line x1="600" y1="62" x2="500" y2="90" stroke="#a8864b" marker-end="url(#arr)"/>
+          </g>
+          <g>
+            <rect x="600" y="180" width="180" height="45" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="690" y="207" text-anchor="middle">3. Renderer draws</text>
+            <line x1="600" y1="202" x2="500" y2="170" stroke="#a8864b" marker-end="url(#arr)"/>
+          </g>
+          <g>
+            <rect x="40" y="180" width="180" height="45" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+            <text x="130" y="207" text-anchor="middle">4. Browser paints</text>
+            <line x1="220" y1="202" x2="320" y2="170" stroke="#a8864b" marker-end="url(#arr)"/>
+          </g>
+        </g>
+      </svg>
+      <div class="caption">Fig. 8.1 — Each frame: run callbacks, update scene, draw, paint, repeat.</div>
+    </div>
+
+    <h3>useFrame anatomy</h3>
+<pre><code>useFrame((state, delta) =&gt; {
+  // state.clock.getElapsedTime() — seconds since start
+  // state.camera — the active camera
+  // state.scene — the root
+  // delta — seconds since last frame (use for frame-rate independent motion)
+})</code></pre>
+
+    <div class="callout key">
+      <div class="label">Key Idea</div>
+      <p>Always multiply motion by <code>delta</code>. <code>ref.current.position.x += 0.01</code> is a bug waiting to happen — its speed depends on frame rate. <code>ref.current.position.x += 1 * delta</code> moves one unit per second, regardless of hardware.</p>
+    </div>
+
+    <h3>Tweened transitions with react-spring</h3>
+    <p>For discrete animations — a hotspot highlighting, a camera moving to a room — reach for <code>@react-spring/three</code>. It plays nicely with R3F and gives you physics-based, interruptible animation.</p>
+
+<pre><code>import { useSpring, a } from '@react-spring/three'
+
+function GrowOnHover() {
+  const [hovered, setHovered] = useState(false)
+  const { scale } = useSpring({ scale: hovered ? 1.2 : 1 })
+  return (
+    &lt;a.mesh
+      scale={scale}
+      onPointerOver={() =&gt; setHovered(true)}
+      onPointerOut={() =&gt; setHovered(false)}
+    &gt;
+      &lt;sphereGeometry /&gt;
+      &lt;meshStandardMaterial color="#c9a866" /&gt;
+    &lt;/a.mesh&gt;
+  )
+}</code></pre>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>Your portfolio will have two animation families: <em>continuous</em> (subtle idle rotation, ambient motion, time-of-day sun sweep — useFrame) and <em>transitional</em> (camera flies to room, hotspot scales on hover — react-spring). Choosing the right tool for each keeps your code calm.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 8.1</div>
+      <p>Make a sphere orbit the origin at a radius of 3, completing one revolution every 5 seconds. Use <code>state.clock.getElapsedTime()</code> and frame-rate independent math.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Day-night toggle</h4>
+      <p>Add a state value <code>timeOfDay</code> with two options. Animate the directional light's position and color between a warm-low morning and a cool-high midday when the state changes. Use react-spring.</p>
+    </div>
+    <details><summary>Recap</summary><p>useFrame runs every frame. Multiply by delta. Use react-spring for tweened, interruptible transitions.</p></details>
+  </div>
+</section>
+
+<!-- CH 9 -->
+<section id="ch9">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">IX</span><h2>Interaction, Events, and Hotspots</h2></div>
+    <p class="lead">Interactive 3D is mostly about answering one question: <em>what did the user just click on?</em> R3F gives you DOM-like event handlers on every mesh — <code>onClick</code>, <code>onPointerOver</code>, <code>onPointerOut</code>, <code>onPointerMove</code> — and handles the ray-casting math behind the scenes.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 800 280">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <circle cx="80" cy="140" r="14" fill="#c9a866"/>
+          <text x="80" y="170" text-anchor="middle" font-size="11">click (x,y)</text>
+          <line x1="94" y1="140" x2="720" y2="140" stroke="#a8864b" stroke-dasharray="4 4"/>
+          <text x="400" y="130" text-anchor="middle" font-size="11" fill="#6b6256" font-style="italic">raycast through camera</text>
+
+          <rect x="300" y="90" width="80" height="100" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="340" y="80" text-anchor="middle" font-size="11">mesh A</text>
+          <rect x="450" y="110" width="80" height="80" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="490" y="100" text-anchor="middle" font-size="11">mesh B</text>
+          <rect x="600" y="120" width="80" height="60" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="640" y="110" text-anchor="middle" font-size="11">mesh C</text>
+
+          <circle cx="340" cy="140" r="6" fill="#a24a3a"/>
+          <text x="340" y="225" text-anchor="middle" font-size="11" fill="#a24a3a">first hit</text>
+          <text x="340" y="242" text-anchor="middle" font-size="10" fill="#6b6256">onClick fires</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 9.1 — A click fires a ray from the camera through the pointer. The first intersected mesh receives the event.</div>
+    </div>
+
+    <h3>Event propagation</h3>
+    <p>By default the event bubbles through every intersected mesh, nearest first. Call <code>event.stopPropagation()</code> to prevent further handlers. This matters when a hotspot sits on top of a wall — you want the hotspot to handle the click, not the wall behind it.</p>
+
+<pre><code>function Hotspot({ position, label, onOpen }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    &lt;mesh
+      position={position}
+      onClick={(e) =&gt; { e.stopPropagation(); onOpen(label) }}
+      onPointerOver={(e) =&gt; { e.stopPropagation(); setHovered(true) }}
+      onPointerOut={() =&gt; setHovered(false)}
+    &gt;
+      &lt;sphereGeometry args={[0.15]} /&gt;
+      &lt;meshStandardMaterial
+        color={hovered ? '#ffffff' : '#c9a866'}
+        emissive={hovered ? '#c9a866' : '#000000'}
+      /&gt;
+    &lt;/mesh&gt;
+  )
+}</code></pre>
+
+    <div class="callout model">
+      <div class="label">Mental Model</div>
+      <p>A hotspot is a small interactive mesh with a label and a callback. Your portfolio is not "a scene with features" — it is "a scene with a set of hotspots". That single reframe is how you keep interaction manageable.</p>
+    </div>
+
+    <h3>UI overlay and 3D scene relationship</h3>
+    <p>Not every UI element should live in 3D. HTML is still the right medium for text-heavy panels, property listings, descriptions. The trick is linking the two: a 3D click opens a 2D panel; a 2D button moves the 3D camera.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 780 260">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="40" y="40" width="320" height="180" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="60" y="65" font-style="italic" fill="#a8864b">3D Canvas</text>
+          <circle cx="160" cy="140" r="10" fill="#c9a866"/>
+          <text x="160" y="165" text-anchor="middle" font-size="11">hotspot</text>
+
+          <rect x="420" y="40" width="320" height="180" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="440" y="65" font-style="italic" fill="#6a7a55">HTML overlay</text>
+          <rect x="450" y="90" width="260" height="30" rx="4" fill="#fff" stroke="#6a7a55"/>
+          <text x="580" y="110" text-anchor="middle" font-size="11">property details</text>
+          <rect x="450" y="140" width="120" height="30" rx="4" fill="#fff" stroke="#6a7a55"/>
+          <text x="510" y="160" text-anchor="middle" font-size="11">view kitchen</text>
+
+          <line x1="170" y1="140" x2="450" y2="105" stroke="#a8864b" stroke-dasharray="4 4" marker-end="url(#arr)"/>
+          <text x="310" y="110" text-anchor="middle" font-size="10" fill="#6b6256">click → opens panel</text>
+          <line x1="450" y1="155" x2="170" y2="150" stroke="#6a7a55" stroke-dasharray="4 4" marker-end="url(#arr)"/>
+          <text x="310" y="175" text-anchor="middle" font-size="10" fill="#6b6256">button → moves camera</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 9.2 — 3D and 2D communicate through shared React state, usually via a store or context.</div>
+    </div>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Forgetting that the cursor should change on hover. Set <code>document.body.style.cursor</code> from your <code>onPointerOver</code> and <code>onPointerOut</code> handlers. Users need the affordance.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 9.1</div>
+      <p>Make a hotspot that logs a message on click, highlights on hover, and changes the cursor to pointer. Confirm propagation is stopped so the wall behind it does not also fire.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Three hotspots</h4>
+      <p>Place three hotspots on your building — front door, second-floor window, chimney. Clicking one opens an HTML overlay outside the Canvas showing the label. Use React state in a shared parent.</p>
+    </div>
+    <details><summary>Recap</summary><p>Events work like DOM events. Propagation matters. Think in hotspots. HTML and 3D talk through shared React state.</p></details>
+  </div>
+</section>
+
+<!-- CH 10 -->
+<section id="ch10">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">X</span><h2>Controls and Navigation</h2></div>
+    <p class="lead">Users need a way to look around. The <code>@react-three/drei</code> library ships pre-built controls: <code>OrbitControls</code>, <code>MapControls</code>, <code>PointerLockControls</code>, and more. You rarely write controls from scratch.</p>
+
+<pre><code>import { OrbitControls } from '@react-three/drei'
+
+&lt;Canvas&gt;
+  &lt;OrbitControls
+    enablePan={false}
+    minDistance={4}
+    maxDistance={20}
+    maxPolarAngle={Math.PI / 2.1}
+  /&gt;
+  { /* scene */ }
+&lt;/Canvas&gt;</code></pre>
+
+    <div class="callout model">
+      <div class="label">Mental Model</div>
+      <p>Controls are not magic — they are a small component that mutates the camera each frame based on pointer input. You can always eject and write your own; most of the time you should not need to.</p>
+    </div>
+
+    <h3>Clamping matters</h3>
+    <p>Unclamped OrbitControls let users drop the camera underground, spin upside down, or zoom inside walls. Every control choice in the snippet above is a polish decision: disabling pan keeps the subject centered, clamping polar angle prevents inverted views, clamping distance prevents "inside a wall" bugs.</p>
+
+    <h3>Scripted camera movement</h3>
+    <p>When a hotspot is clicked, you want the camera to glide to a new position rather than teleport. Combine controls with react-spring, or use drei's <code>CameraControls</code> which exposes <code>setLookAt()</code> with built-in interpolation.</p>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>Your portfolio will have two navigation modes: <em>overview</em> (OrbitControls, clamped) and <em>walkthrough</em> (scripted camera moves between predefined vantage points). A single state machine decides which mode is active.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 10.1</div>
+      <p>Add OrbitControls. Clamp so the camera cannot go below the ground plane. Set min and max distance so the viewer cannot lose the building.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Clicking a hotspot flies the camera</h4>
+      <p>Each hotspot gets a <code>cameraTarget</code> prop — a position and look-at pair. Clicking it interpolates the camera to that pose over one second. Use drei's <code>CameraControls</code> or react-spring on the camera ref.</p>
+    </div>
+    <details><summary>Recap</summary><p>Use drei's controls. Clamp everything. Mix free navigation with scripted camera moves for polish.</p></details>
+  </div>
+</section>
+
+<!-- CH 11 -->
+<section id="ch11">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">XI</span><h2>Loading Models and Assets</h2></div>
+    <p class="lead">Primitives get you far, but eventually you want real geometry — furniture, architectural details, decorative props. The standard format is glTF (<code>.gltf</code> or the binary <code>.glb</code>), and drei's <code>useGLTF</code> hook makes loading one almost trivial.</p>
+
+<pre><code>import { useGLTF } from '@react-three/drei'
+
+function Sofa(props) {
+  const { scene } = useGLTF('/models/sofa.glb')
+  return &lt;primitive object={scene} {...props} /&gt;
+}
+useGLTF.preload('/models/sofa.glb')</code></pre>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 220">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="30" y="70" width="140" height="80" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="100" y="105" text-anchor="middle" font-style="italic">file.glb</text>
+          <text x="100" y="125" text-anchor="middle" font-size="11" fill="#6b6256">on server</text>
+
+          <line x1="170" y1="110" x2="245" y2="110" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="250" y="70" width="160" height="80" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="330" y="105" text-anchor="middle" font-style="italic">useGLTF</text>
+          <text x="330" y="125" text-anchor="middle" font-size="11" fill="#6b6256">parse + cache</text>
+
+          <line x1="410" y1="110" x2="485" y2="110" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="490" y="70" width="160" height="80" rx="8" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="570" y="105" text-anchor="middle" font-style="italic">THREE.Group</text>
+          <text x="570" y="125" text-anchor="middle" font-size="11" fill="#6b6256">in memory</text>
+
+          <line x1="650" y1="110" x2="725" y2="110" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="730" y="70" width="70" height="80" rx="8" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="765" y="115" text-anchor="middle" font-style="italic">scene</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 11.1 — The path from file to visible object.</div>
+    </div>
+
+    <h3>Suspense</h3>
+    <p><code>useGLTF</code> suspends until the model is ready. That means the calling component must live inside a <code>&lt;Suspense&gt;</code> boundary — typically the entire scene.</p>
+
+<pre><code>&lt;Canvas&gt;
+  &lt;Suspense fallback={null}&gt;
+    &lt;Sofa position={[0, 0, 0]} /&gt;
+  &lt;/Suspense&gt;
+&lt;/Canvas&gt;</code></pre>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Forgetting Suspense and getting a cryptic error. R3F is strict about this — every async asset must be inside a boundary.</p>
+    </div>
+
+    <div class="callout why">
+      <div class="label">Why It Matters</div>
+      <p>Real portfolios use real models. A couch from a glTF file carries shape, materials, UVs, and sometimes animations — everything you would spend weeks authoring by hand. Learn to trust loaded models as first-class citizens.</p>
+    </div>
+
+    <div class="callout ts">
+      <div class="label">TypeScript Tip</div>
+      <p>For type-safe access to named nodes, run <code>npx gltfjsx model.glb</code>. It generates a typed component with named refs for every mesh in the file — perfect for swapping materials, wiring up hotspots, or hiding parts.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 11.1</div>
+      <p>Find a free <code>.glb</code> (Poly Haven, Sketchfab CC models). Place it in <code>/public/models/</code>. Load it with <code>useGLTF</code>. Scale and position it until it sits correctly in your scene.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Swap the block for a model</h4>
+      <p>Replace your blocky building with a loaded glTF (or keep the blocks and add a few furniture models inside). Wrap the scene in <code>&lt;Suspense&gt;</code> with a fallback that shows nothing or a simple loader.</p>
+    </div>
+    <details><summary>Recap</summary><p>glTF is the standard format. useGLTF loads and caches. Everything async goes inside Suspense. gltfjsx gives typed access.</p></details>
+  </div>
+</section>
+
+<!-- CH 12 -->
+<section id="ch12">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">XII</span><h2>Reusable Scene Systems and Architecture</h2></div>
+    <p class="lead">At this point you have a lot of parts. A serious portfolio needs a <em>system</em> — a set of conventions that make adding the next property, the next room, the next hotspot, feel like filling in a form rather than writing new software.</p>
+
+    <h3>Folder structure</h3>
+<pre><code>src/
+  scene/
+    Canvas.tsx          // the root Canvas + providers
+    Lighting.tsx        // three-light rig + time of day
+    Controls.tsx        // OrbitControls + scripted moves
+  components/
+    Property.tsx        // high-level wrapper
+    Building.tsx        // one building
+    Room.tsx            // one room inside a building
+    Hotspot.tsx         // interactive point
+  data/
+    properties.ts       // pure data — no JSX
+  state/
+    useAppStore.ts      // Zustand store
+  ui/
+    PropertyPanel.tsx   // HTML overlay
+    TimeToggle.tsx      // HTML control</code></pre>
+
+    <div class="callout key">
+      <div class="label">Key Idea</div>
+      <p>Separate <em>data</em>, <em>scene components</em>, <em>HTML UI</em>, and <em>state</em>. Each folder has one job. When something breaks you know where to look. When something grows you know where it belongs.</p>
+    </div>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 320">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="40" y="40" width="740" height="240" rx="12" fill="none" stroke="#a8864b" stroke-dasharray="4 4"/>
+          <text x="60" y="65" font-size="16" font-style="italic" fill="#a8864b">App</text>
+
+          <rect x="70" y="90" width="200" height="170" rx="8" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="170" y="115" text-anchor="middle" font-style="italic">3D Canvas</text>
+          <rect x="90" y="130" width="160" height="30" rx="4" fill="#fbf6e9"/>
+          <text x="170" y="150" text-anchor="middle" font-size="11">Lighting + Controls</text>
+          <rect x="90" y="170" width="160" height="30" rx="4" fill="#fbf6e9"/>
+          <text x="170" y="190" text-anchor="middle" font-size="11">Property (from data)</text>
+          <rect x="90" y="210" width="160" height="30" rx="4" fill="#fbf6e9"/>
+          <text x="170" y="230" text-anchor="middle" font-size="11">Hotspots</text>
+
+          <rect x="310" y="90" width="200" height="170" rx="8" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="410" y="115" text-anchor="middle" font-style="italic">State (Zustand)</text>
+          <text x="410" y="145" text-anchor="middle" font-size="11" fill="#6b6256">selectedProperty</text>
+          <text x="410" y="165" text-anchor="middle" font-size="11" fill="#6b6256">activeRoom</text>
+          <text x="410" y="185" text-anchor="middle" font-size="11" fill="#6b6256">timeOfDay</text>
+          <text x="410" y="205" text-anchor="middle" font-size="11" fill="#6b6256">cameraMode</text>
+
+          <rect x="550" y="90" width="200" height="170" rx="8" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="650" y="115" text-anchor="middle" font-style="italic">HTML UI</text>
+          <rect x="570" y="130" width="160" height="30" rx="4" fill="#fff" stroke="#a24a3a"/>
+          <text x="650" y="150" text-anchor="middle" font-size="11">Property panel</text>
+          <rect x="570" y="170" width="160" height="30" rx="4" fill="#fff" stroke="#a24a3a"/>
+          <text x="650" y="190" text-anchor="middle" font-size="11">Time toggle</text>
+          <rect x="570" y="210" width="160" height="30" rx="4" fill="#fff" stroke="#a24a3a"/>
+          <text x="650" y="230" text-anchor="middle" font-size="11">Navigation menu</text>
+
+          <line x1="270" y1="175" x2="310" y2="175" stroke="#6a7a55" marker-end="url(#arr)"/>
+          <line x1="550" y1="175" x2="510" y2="175" stroke="#6a7a55" marker-end="url(#arr)"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 12.1 — The three worlds of a R3F application, connected through a single state store.</div>
+    </div>
+
+    <h3>Data-driven scenes</h3>
+    <p>Instead of hardcoding buildings, describe them as data:</p>
+<pre><code>// data/properties.ts
+export const properties = [
+  {
+    id: 'villa-ivory',
+    name: 'Villa Ivory',
+    position: [0, 0, 0],
+    model: '/models/villa.glb',
+    hotspots: [
+      { id: 'door', position: [0, 1, 2], label: 'Entrance' },
+      { id: 'pool', position: [3, 0, 1], label: 'Infinity pool' },
+    ],
+  },
+]</code></pre>
+
+    <p>Your <code>&lt;Property&gt;</code> component maps over this data and renders the right components. Adding a new property is a single object. This is the payoff of all the discipline.</p>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>This is the heart of your capstone. Everything — models, hotspots, camera targets, panel content — flows from a single array of property objects. The rest of your app is a renderer.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 12.1</div>
+      <p>Move your hotspot definitions out of JSX and into a data file. Have the component map over the array. Add a second property with different hotspot positions — without duplicating component code.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Refactor to system</h4>
+      <p>Introduce the folder structure above. Install Zustand. Move time-of-day and selected-property into the store. Confirm both a 3D component and an HTML component can read and update it.</p>
+    </div>
+    <details><summary>Recap</summary><p>Separate data, scene, UI, state. Describe properties as data. Make adding the next one trivial.</p></details>
+  </div>
+</section>
+
+<!-- CH 13 -->
+<section id="ch13">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">XIII</span><h2>Debugging in Three Dimensions</h2></div>
+    <p class="lead">3D bugs have a special flavor. The scene renders but looks wrong. An object is "invisible" but actually 10,000 units away. Lighting is off because a normal is flipped. The camera is inside a wall. Debugging 3D is about having tools that reveal the invisible.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 260">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="40" y="40" width="150" height="60" rx="8" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="115" y="75" text-anchor="middle">Symptom</text>
+          <line x1="190" y1="70" x2="245" y2="70" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="250" y="40" width="150" height="60" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="325" y="75" text-anchor="middle">Visualize</text>
+          <line x1="400" y1="70" x2="455" y2="70" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="460" y="40" width="150" height="60" rx="8" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="535" y="75" text-anchor="middle">Isolate</text>
+          <line x1="610" y1="70" x2="665" y2="70" stroke="#a8864b" marker-end="url(#arr)"/>
+
+          <rect x="670" y="40" width="130" height="60" rx="8" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="735" y="75" text-anchor="middle">Fix</text>
+
+          <text x="420" y="160" text-anchor="middle" font-style="italic" font-size="15" fill="#6b6256">
+            The loop: helpers, solo rendering, print positions, check units.
+          </text>
+          <text x="420" y="185" text-anchor="middle" font-size="12" fill="#6b6256">
+            Every 3D bug becomes small once you can see it.
+          </text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 13.1 — A debugging loop that works for almost any 3D mystery.</div>
+    </div>
+
+    <h3>The debugging toolkit</h3>
+    <p><strong>Helpers.</strong> drei ships <code>&lt;axesHelper&gt;</code>, <code>&lt;gridHelper&gt;</code>, <code>&lt;Stats&gt;</code>, and wrappers for light helpers. Drop them in during development and delete for production.</p>
+    <p><strong>Leva.</strong> The <code>leva</code> package gives you a floating control panel for any value — light intensity, camera fov, material roughness. Tuning becomes fast because the feedback loop is immediate.</p>
+    <p><strong>Print positions.</strong> When something is "invisible" the first question is always: where is it? Log <code>ref.current.position</code> and confirm it is where you think.</p>
+    <p><strong>Check your units.</strong> 1 unit = 1 meter is a healthy convention. Loaded models sometimes come in at 100× scale. A scale prop of 0.01 often reveals a missing building.</p>
+    <p><strong>Solo a component.</strong> If your full scene is broken, render just the suspect component on a fresh Canvas. Bugs stop hiding once you remove the crowd.</p>
+
+    <div class="callout mistake">
+      <div class="label">Common Mistake</div>
+      <p>Assuming "it's invisible" means "it's not rendering". 90% of the time it is rendering somewhere you cannot see — behind the camera, under the ground, or 500 meters away.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 13.1</div>
+      <p>Deliberately break your scene: set a model's position to <code>[1000, 0, 0]</code>. Then use axesHelper, gridHelper, and leva to diagnose and fix it without reading your source.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Dev overlay</h4>
+      <p>Add a dev-mode toggle that shows <code>&lt;Stats&gt;</code>, <code>&lt;axesHelper&gt;</code>, and a leva panel with controls for ambient intensity, directional intensity, and camera fov. Hide it behind a keyboard shortcut so production is clean.</p>
+    </div>
+    <details><summary>Recap</summary><p>Visualize, isolate, fix. Keep helpers and leva close at hand. Units and positions lie more often than logic does.</p></details>
+  </div>
+</section>
+
+<!-- CH 14 -->
+<section id="ch14">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">XIV</span><h2>The Performance Mindset</h2></div>
+    <p class="lead">3D performance is ruthless and measurable. Sixty frames per second is the target. Every millisecond matters. Fortunately the optimizations you will actually need are few, and they become reflex with practice.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 820 260">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="40" y="40" width="200" height="180" rx="10" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="140" y="70" text-anchor="middle" font-style="italic" font-size="16">Draw calls</text>
+          <text x="140" y="100" text-anchor="middle" font-size="12" fill="#6b6256">one per mesh</text>
+          <text x="140" y="130" text-anchor="middle" font-size="11" fill="#6b6256">→ merge statics</text>
+          <text x="140" y="150" text-anchor="middle" font-size="11" fill="#6b6256">→ instance repeats</text>
+          <text x="140" y="170" text-anchor="middle" font-size="11" fill="#6b6256">→ frustum cull</text>
+
+          <rect x="260" y="40" width="200" height="180" rx="10" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="360" y="70" text-anchor="middle" font-style="italic" font-size="16">State &amp; re-renders</text>
+          <text x="360" y="100" text-anchor="middle" font-size="12" fill="#6b6256">useState triggers</text>
+          <text x="360" y="130" text-anchor="middle" font-size="11" fill="#6b6256">→ refs for per-frame</text>
+          <text x="360" y="150" text-anchor="middle" font-size="11" fill="#6b6256">→ split components</text>
+          <text x="360" y="170" text-anchor="middle" font-size="11" fill="#6b6256">→ memoize props</text>
+
+          <rect x="480" y="40" width="200" height="180" rx="10" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="580" y="70" text-anchor="middle" font-style="italic" font-size="16">Assets</text>
+          <text x="580" y="100" text-anchor="middle" font-size="12" fill="#6b6256">textures &amp; models</text>
+          <text x="580" y="130" text-anchor="middle" font-size="11" fill="#6b6256">→ compress (KTX2)</text>
+          <text x="580" y="150" text-anchor="middle" font-size="11" fill="#6b6256">→ draco models</text>
+          <text x="580" y="170" text-anchor="middle" font-size="11" fill="#6b6256">→ lazy load</text>
+
+          <rect x="700" y="40" width="90" height="180" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="745" y="120" text-anchor="middle" font-style="italic" font-size="15">DPR</text>
+          <text x="745" y="145" text-anchor="middle" font-size="11" fill="#6b6256">clamp</text>
+        </g>
+      </svg>
+      <div class="caption">Fig. 14.1 — The four knobs you will actually turn.</div>
+    </div>
+
+    <h3>Rules of thumb</h3>
+    <p><strong>Clamp DPR.</strong> <code>dpr={[1, 2]}</code> on Canvas. Retina screens can easily be rendering 4× the pixels of a standard one; clamping is free performance.</p>
+    <p><strong>Instance repeats.</strong> If you need a hundred identical trees, use <code>&lt;Instances&gt;</code> from drei. One draw call, one hundred trees.</p>
+    <p><strong>Reuse geometry and materials.</strong> Create them once with <code>useMemo</code> and share across components. A fresh geometry per mount is a leak.</p>
+    <p><strong>Refs over state for animation.</strong> Revisit chapter 7 — this is the single biggest lever.</p>
+    <p><strong>Suspense boundaries for code-splitting.</strong> Lazy-load a heavy interior model only when the user enters that room.</p>
+
+    <div class="callout why">
+      <div class="label">Why It Matters</div>
+      <p>A portfolio that stutters on a mid-range laptop is a portfolio nobody scrolls. Performance is a feature that earns attention.</p>
+    </div>
+
+    <div class="callout exercise">
+      <div class="label">Exercise 14.1</div>
+      <p>Add a hundred small meshes individually. Observe the frame rate with <code>&lt;Stats&gt;</code>. Replace them with <code>&lt;Instances&gt;</code>. Observe again. The difference is the lesson.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Chapter Task</div>
+      <h4>Performance audit</h4>
+      <p>Open your portfolio. Turn on Stats. Walk through the scene. Write down any moment the frame rate dips. For each dip, apply one of the rules of thumb and re-measure.</p>
+    </div>
+    <details><summary>Recap</summary><p>Watch draw calls, state, and assets. Clamp DPR. Instance repeats. Refs for animation. Measure, then optimize.</p></details>
+  </div>
+</section>
+
+<!-- CAPSTONE -->
+<section id="capstone">
+  <div class="wrap">
+    <div class="chap-head"><span class="num">XV</span><h2>Capstone — The Real Estate Portfolio</h2></div>
+    <p class="lead">Everything you have practiced is now assembled into one deliverable: an interactive 3D real estate portfolio. This section is both a roadmap and a specification. Follow it linearly and you will ship.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 860 440">
+        <g font-family="Cormorant Garamond, serif" font-size="13" fill="#1d1a15">
+          <rect x="30" y="20" width="800" height="400" rx="14" fill="none" stroke="#7b5a2e" stroke-width="2" stroke-dasharray="6 6"/>
+          <text x="50" y="50" font-size="18" font-style="italic" fill="#7b5a2e">Portfolio System Architecture</text>
+
+          <rect x="60" y="80" width="220" height="80" rx="10" fill="#f2e7cc" stroke="#7b5a2e"/>
+          <text x="170" y="110" text-anchor="middle" font-style="italic" font-size="15">data/properties.ts</text>
+          <text x="170" y="132" text-anchor="middle" font-size="11" fill="#6b6256">list of properties</text>
+          <text x="170" y="148" text-anchor="middle" font-size="11" fill="#6b6256">hotspots, models, camera</text>
+
+          <rect x="320" y="80" width="220" height="80" rx="10" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="430" y="110" text-anchor="middle" font-style="italic" font-size="15">state/useAppStore</text>
+          <text x="430" y="132" text-anchor="middle" font-size="11" fill="#6b6256">selectedProperty</text>
+          <text x="430" y="148" text-anchor="middle" font-size="11" fill="#6b6256">activeRoom, timeOfDay</text>
+
+          <rect x="580" y="80" width="220" height="80" rx="10" fill="#fbf0ec" stroke="#a24a3a"/>
+          <text x="690" y="110" text-anchor="middle" font-style="italic" font-size="15">ui/ (HTML)</text>
+          <text x="690" y="132" text-anchor="middle" font-size="11" fill="#6b6256">property list, panel</text>
+          <text x="690" y="148" text-anchor="middle" font-size="11" fill="#6b6256">time toggle, controls</text>
+
+          <rect x="60" y="200" width="740" height="200" rx="10" fill="#fffdf7" stroke="#a8864b"/>
+          <text x="80" y="225" font-size="15" font-style="italic" fill="#a8864b">&lt;Canvas&gt;</text>
+
+          <rect x="90" y="245" width="150" height="50" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="165" y="275" text-anchor="middle">Lighting</text>
+          <rect x="260" y="245" width="150" height="50" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="335" y="275" text-anchor="middle">Controls</text>
+          <rect x="430" y="245" width="150" height="50" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="505" y="275" text-anchor="middle">Environment</text>
+          <rect x="600" y="245" width="180" height="50" rx="6" fill="#fbf6e9" stroke="#a8864b"/>
+          <text x="690" y="275" text-anchor="middle">Suspense + Property</text>
+
+          <rect x="90" y="320" width="150" height="50" rx="6" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="165" y="350" text-anchor="middle">Building</text>
+          <rect x="260" y="320" width="150" height="50" rx="6" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="335" y="350" text-anchor="middle">Rooms</text>
+          <rect x="430" y="320" width="150" height="50" rx="6" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="505" y="350" text-anchor="middle">Hotspots</text>
+          <rect x="600" y="320" width="180" height="50" rx="6" fill="#f6f8f0" stroke="#6a7a55"/>
+          <text x="690" y="350" text-anchor="middle">Camera rig</text>
+
+          <line x1="170" y1="160" x2="430" y2="200" stroke="#6b6256" stroke-dasharray="3 3"/>
+          <line x1="430" y1="160" x2="430" y2="200" stroke="#6b6256" stroke-dasharray="3 3"/>
+          <line x1="690" y1="160" x2="690" y2="200" stroke="#6b6256" stroke-dasharray="3 3"/>
+        </g>
+      </svg>
+      <div class="caption">Fig. 15.1 — The complete system. Data flows down, events flow up, state lives in one place.</div>
+    </div>
+
+    <h3>Milestone 1 — The shell</h3>
+    <p>One Canvas, three-light rig, ground plane, OrbitControls clamped. A single placeholder building. No state, no UI. This is your "it runs" checkpoint.</p>
+
+    <h3>Milestone 2 — The system</h3>
+    <p>Introduce <code>data/properties.ts</code> with one entry. Introduce a Zustand store with <code>selectedProperty</code>. Render the property from data. The scene should look the same but the code should feel different.</p>
+
+    <h3>Milestone 3 — Hotspots and HTML overlay</h3>
+    <p>Add the <code>Hotspot</code> component. Render hotspots from the property's data. Clicking one sets <code>activeRoom</code> in the store. An HTML panel outside the Canvas reads <code>activeRoom</code> and shows details.</p>
+
+    <h3>Milestone 4 — Real geometry</h3>
+    <p>Swap the placeholder block for a loaded glTF model. Wrap in Suspense. Add a simple loading indicator in HTML that reads a <code>isLoading</code> flag.</p>
+
+    <h3>Milestone 5 — Scripted camera</h3>
+    <p>Clicking a hotspot now also interpolates the camera to that hotspot's vantage point. A "back to overview" button in HTML returns to the default pose.</p>
+
+    <h3>Milestone 6 — Atmosphere</h3>
+    <p>Time-of-day toggle with three moods. Each mood animates the directional light color, intensity, and position. Optional: a subtle particle layer for dust in sunbeams.</p>
+
+    <h3>Milestone 7 — Multiple properties</h3>
+    <p>Add a second and third property to the data file. Render a property list in HTML. Clicking a name switches <code>selectedProperty</code>; the scene fades and swaps. This is the moment the system pays off.</p>
+
+    <h3>Milestone 8 — Polish pass</h3>
+    <p>Performance audit with Stats. Clamp DPR. Memoize heavy props. Add hover cursors. Add a proper loading screen. Favicon, page title, og-image. Deploy to Vercel or Netlify.</p>
+
+    <div class="callout portfolio">
+      <div class="label">Real Estate Portfolio Connection</div>
+      <p>By the end of milestone 8, you have a real deliverable you can share. Not a demo, not a toy — a small product. This is what the entire book was pointing at.</p>
+    </div>
+
+    <div class="callout task">
+      <div class="label">Capstone Task</div>
+      <h4>Ship it</h4>
+      <p>Complete milestones 1 through 8. Deploy. Write a one-paragraph case study about a decision you made and why. Congratulate yourself — you now think in scenes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GLOSSARY -->
+<section id="glossary">
+  <div class="wrap">
+    <span class="tag">Reference</span>
+    <h2>Glossary</h2>
+    <dl class="glossary">
+      <dt>Canvas</dt><dd>The R3F root component. Creates renderer, scene, camera, and frame loop.</dd>
+      <dt>Scene graph</dt><dd>The tree of 3D objects. Children inherit parent transforms.</dd>
+      <dt>Mesh</dt><dd>A visible 3D object composed of geometry and material.</dd>
+      <dt>Geometry</dt><dd>The shape of a mesh — vertices and faces.</dd>
+      <dt>Material</dt><dd>How a surface responds to light — color, roughness, metalness, etc.</dd>
+      <dt>Ambient light</dt><dd>Uniform illumination from all directions; prevents black shadows.</dd>
+      <dt>Directional light</dt><dd>Parallel rays from one direction; simulates the sun; casts shadows.</dd>
+      <dt>Point light</dt><dd>Light radiating from a single point; simulates a bulb.</dd>
+      <dt>Spot light</dt><dd>Conical light; simulates a flashlight or gallery accent.</dd>
+      <dt>Perspective camera</dt><dd>Camera with realistic foreshortening; distant objects look smaller.</dd>
+      <dt>Orthographic camera</dt><dd>Camera without foreshortening; useful for plans and isometric views.</dd>
+      <dt>Radian</dt><dd>Angle unit used by Three.js. <code>Math.PI</code> equals 180°.</dd>
+      <dt>Transform</dt><dd>The combination of position, rotation, and scale.</dd>
+      <dt>Local space</dt><dd>Coordinates relative to a parent group.</dd>
+      <dt>World space</dt><dd>Absolute coordinates in the scene.</dd>
+      <dt>Ref</dt><dd>A React handle to a live Three.js object for imperative mutation.</dd>
+      <dt>useFrame</dt><dd>Hook that runs a callback every rendered frame.</dd>
+      <dt>Delta</dt><dd>Seconds elapsed since the previous frame; multiply motion by it.</dd>
+      <dt>react-spring</dt><dd>Physics-based animation library that plays well with R3F.</dd>
+      <dt>Raycasting</dt><dd>Math that turns a pointer position into an intersection with 3D objects.</dd>
+      <dt>Hotspot</dt><dd>A small interactive mesh representing a point of interest.</dd>
+      <dt>OrbitControls</dt><dd>Drei component allowing the user to rotate, pan, and zoom around a target.</dd>
+      <dt>glTF / glb</dt><dd>Standard file formats for 3D models. <code>.glb</code> is the binary variant.</dd>
+      <dt>useGLTF</dt><dd>Drei hook that loads and caches a glTF file.</dd>
+      <dt>Suspense</dt><dd>React boundary required when loading async assets in R3F.</dd>
+      <dt>gltfjsx</dt><dd>CLI that generates a typed React component from a glTF file.</dd>
+      <dt>Instances</dt><dd>Drei component for rendering many copies of one mesh in a single draw call.</dd>
+      <dt>DPR</dt><dd>Device pixel ratio; clamping it caps the number of pixels rendered.</dd>
+      <dt>Draw call</dt><dd>A single GPU command to draw a mesh; the main performance cost to watch.</dd>
+      <dt>Frustum culling</dt><dd>Automatic optimization: objects outside the camera's view are not drawn.</dd>
+      <dt>Leva</dt><dd>A floating UI panel for tweaking values live during development.</dd>
+      <dt>Drei</dt><dd>A companion library of helpful R3F components and hooks.</dd>
+      <dt>Zustand</dt><dd>A small state management library ideal for sharing state between 3D and HTML layers.</dd>
+      <dt>Environment map</dt><dd>An image used to light and reflect in a scene, giving materials their surroundings.</dd>
+      <dt>Shadow map</dt><dd>A texture storing depth from a light's view; used to calculate shadows.</dd>
+    </dl>
+  </div>
+</section>
+
+<footer>
+  <p>End of Book II — React Three Fiber for Interactive 3D Portfolio Experiences</p>
+</footer>
+
+<script>
+// Hero particle canvas
+;(function(){
+  const canvas = document.getElementById('heroCanvas')
+  if(!canvas) return
+  const ctx = canvas.getContext('2d')
+  let W, H, nodes=[], raf
+  const COUNT=60, LINK=130
+
+  function resize(){
+    W = canvas.width = canvas.offsetWidth
+    H = canvas.height = canvas.offsetHeight
+  }
+
+  function init(){
+    nodes=[]
+    for(let i=0;i<COUNT;i++) nodes.push({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.28, vy:(Math.random()-.5)*.28,
+      r:Math.random()*1.4+.4
+    })
+  }
+
+  function isDark(){
+    const t=document.documentElement.getAttribute('data-theme')
+    return t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme:dark)').matches)
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,W,H)
+    const gold = isDark() ? '212,168,92' : '160,124,55'
+    for(let i=0;i<nodes.length;i++){
+      const n=nodes[i]
+      n.x+=n.vx; n.y+=n.vy
+      if(n.x<0||n.x>W) n.vx*=-1
+      if(n.y<0||n.y>H) n.vy*=-1
+      for(let j=i+1;j<nodes.length;j++){
+        const m=nodes[j],dx=n.x-m.x,dy=n.y-m.y,d=Math.hypot(dx,dy)
+        if(d<LINK){
+          ctx.beginPath()
+          ctx.strokeStyle=`rgba(${gold},${(1-d/LINK)*.28})`
+          ctx.lineWidth=.7
+          ctx.moveTo(n.x,n.y); ctx.lineTo(m.x,m.y); ctx.stroke()
+        }
+      }
+      ctx.beginPath()
+      ctx.fillStyle=`rgba(${gold},${.35+n.r*.15})`
+      ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fill()
+    }
+    raf=requestAnimationFrame(tick)
+  }
+
+  resize(); init(); tick()
+  window.addEventListener('resize',function(){ resize(); init() })
+})()
+
+// Hero mouse parallax
+;(function(){
+  const hero=document.querySelector('.hero')
+  const outer=document.getElementById('heroDiagramOuter')
+  if(!hero) return
+  let entered=false
+
+  hero.addEventListener('mousemove',function(e){
+    const r=hero.getBoundingClientRect()
+    const mx=(e.clientX-r.left)/r.width-.5
+    const my=(e.clientY-r.top)/r.height-.5
+    const orbs=hero.querySelectorAll('.orb')
+    orbs[0] && (orbs[0].style.transform=`translate3d(${mx*-28}px,${my*-18}px,0) scale(1.04)`)
+    orbs[1] && (orbs[1].style.transform=`translate3d(${mx*20}px,${my*14}px,0) scale(1.02)`)
+    orbs[2] && (orbs[2].style.transform=`translate3d(${mx*-14}px,${my*-9}px,0)`)
+    if(outer) outer.style.transform=`translateY(calc(-50% + ${my*10}px)) translateX(${mx*14}px)`
+  })
+
+  hero.addEventListener('mouseleave',function(){
+    hero.querySelectorAll('.orb').forEach(o=>o.style.transform='')
+    if(outer) outer.style.transform=''
+  })
+})()
+
+// Scroll progress bar
+;(function(){
+  const fill = document.getElementById('scrollFill')
+  function update(){
+    const h = document.documentElement
+    const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100
+    fill.style.width = Math.min(pct, 100) + '%'
+  }
+  window.addEventListener('scroll', update, { passive: true })
+  update()
+})()
+
+// Scroll reveal
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in') })
+}, { threshold: 0.12 })
+document.querySelectorAll('section, .diagram, .callout, .panel').forEach(el => {
+  el.classList.add('reveal'); io.observe(el)
+})
+
+// Dark mode toggle
+;(function(){
+  const root = document.documentElement
+  const btn = document.getElementById('themeToggle')
+  const icon = document.getElementById('themeIcon')
+  const label = document.getElementById('themeLabel')
+  const sysDark = window.matchMedia('(prefers-color-scheme: dark)')
+
+  function isDark(){
+    const saved = localStorage.getItem('theme')
+    if(saved) return saved === 'dark'
+    return sysDark.matches
+  }
+  function apply(dark){
+    root.setAttribute('data-theme', dark ? 'dark' : 'light')
+    icon.textContent = dark ? '☀' : '☽'
+    label.textContent = dark ? 'Light' : 'Dark'
+  }
+  apply(isDark())
+  btn.addEventListener('click', function(){
+    const next = root.getAttribute('data-theme') !== 'dark'
+    localStorage.setItem('theme', next ? 'dark' : 'light')
+    apply(next)
+  })
+  sysDark.addEventListener('change', function(e){
+    if(!localStorage.getItem('theme')) apply(e.matches)
+  })
+})()
+</script>
+</body>
+</html>
