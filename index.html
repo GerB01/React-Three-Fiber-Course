@@ -431,9 +431,104 @@ hr.rule{border:none;height:1px;background:var(--line);margin:3rem auto;max-width
   :root:not([data-theme="light"]) .diagram{background:linear-gradient(180deg,#1e1c14,#191710)}
   :root:not([data-theme="light"]) footer{background:var(--paper)}
 }
+
+/* ── PASSWORD GATE ── */
+#gate{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:
+    radial-gradient(ellipse at 20% 10%,rgba(201,168,102,.18),transparent 60%),
+    radial-gradient(ellipse at 80% 90%,rgba(178,106,84,.10),transparent 55%),
+    linear-gradient(180deg,var(--ivory),var(--paper));
+}
+#gate.hide{
+  opacity:0;pointer-events:none;
+  transition:opacity .6s cubic-bezier(.16,1,.3,1);
+}
+.gate-box{
+  text-align:center;
+  padding:3.2rem 3rem;
+  max-width:380px;width:90%;
+  border:1px solid var(--line);
+  background:var(--paper);
+  box-shadow:var(--shadow);
+  animation:heroUp .9s cubic-bezier(.16,1,.3,1) forwards;
+}
+.gate-box .eyebrow{
+  display:flex;align-items:center;gap:.8rem;justify-content:center;
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:1.6rem;
+}
+.gate-box .eyebrow::before,.gate-box .eyebrow::after{
+  content:'';height:1px;background:var(--gold);width:40px;
+}
+.gate-box h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2.2rem;font-weight:500;
+  margin:0 0 .3em;color:var(--ink);
+}
+.gate-box p{font-size:.9rem;color:var(--muted);margin:0 0 2rem}
+.gate-input{
+  width:100%;
+  padding:.75rem 1rem;
+  background:var(--ivory);
+  border:1px solid var(--line);
+  color:var(--ink);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.95rem;
+  letter-spacing:.15em;
+  text-align:center;
+  outline:none;
+  transition:border-color .3s,box-shadow .3s;
+  margin-bottom:1.2rem;
+}
+.gate-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(168,134,75,.12)}
+.gate-input.shake{animation:shake .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{
+  10%,90%{transform:translateX(-3px)}
+  20%,80%{transform:translateX(5px)}
+  30%,50%,70%{transform:translateX(-5px)}
+  40%,60%{transform:translateX(5px)}
+}
+.gate-btn{
+  display:inline-block;width:100%;
+  padding:.9rem 2rem;
+  border:1px solid var(--gold);
+  background:transparent;
+  color:var(--gold);
+  font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:background .4s,color .4s,box-shadow .4s;
+}
+.gate-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(110deg,transparent 25%,rgba(212,168,92,.2) 50%,transparent 75%);
+  transform:translateX(-100%);
+  transition:transform .65s ease;
+}
+.gate-btn:hover::before{transform:translateX(100%)}
+.gate-btn:hover{background:var(--gold);color:var(--ivory);box-shadow:0 0 28px -4px rgba(168,134,75,.45)}
+.gate-error{
+  font-size:.78rem;color:var(--rose);
+  margin-top:.8rem;height:1em;
+  opacity:0;transition:opacity .3s;
+}
+.gate-error.show{opacity:1}
 </style>
 </head>
 <body>
+
+<div id="gate">
+  <div class="gate-box">
+    <div class="eyebrow">Private Access</div>
+    <h2>React Three Fiber</h2>
+    <p>Enter the access key to continue</p>
+    <input id="gateInput" class="gate-input" type="password" placeholder="············" autocomplete="current-password" />
+    <button class="gate-btn" onclick="checkGate()">Enter</button>
+    <div id="gateError" class="gate-error">Incorrect password. Try again.</div>
+  </div>
+</div>
 
 <div class="scroll-bar" role="progressbar" aria-label="Reading progress">
   <div class="scroll-bar__fill" id="scrollFill"></div>
@@ -1839,6 +1934,37 @@ export const properties = [
 </footer>
 
 <script>
+// Password gate
+;(function(){
+  const gate  = document.getElementById('gate')
+  const input = document.getElementById('gateInput')
+  const error = document.getElementById('gateError')
+  const PASS  = 'tono2026'
+
+  function unlock(){
+    gate.classList.add('hide')
+    gate.addEventListener('transitionend', () => gate.remove(), {once:true})
+    document.body.style.overflow = ''
+  }
+
+  function checkGate(){
+    if(input.value === PASS){
+      unlock()
+    } else {
+      input.classList.remove('shake')
+      void input.offsetWidth // reflow to restart animation
+      input.classList.add('shake')
+      error.classList.add('show')
+      input.value = ''
+      input.focus()
+    }
+  }
+  window.checkGate = checkGate
+
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') checkGate() })
+  document.body.style.overflow = 'hidden'
+})()
+
 // Hero particle canvas
 ;(function(){
   const canvas = document.getElementById('heroCanvas')
