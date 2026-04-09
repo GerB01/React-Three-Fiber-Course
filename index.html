@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>React Three Fiber — Premium Real Estate &amp; Architectural Experiences · Book II</title>
-<link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/3/3f/Three.js_Icon.svg">
+<link rel="icon" href="c:\Users\German Barreto\Documents\Claude\Projects\React & R3F Manual\Book2_R3F.html">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 
@@ -244,6 +244,12 @@ nav.top ul a:hover{color:var(--gold)}
 }
 .callout.task .label{color:var(--gold);font-size:.72rem}
 .callout.task h4{margin:.2em 0 .6em;color:var(--ink)}
+.callout.prod{border-color:#4a6a9a;background:linear-gradient(180deg,#eef3fa,#e4edf8)}
+.callout.prod .label{color:#2c4f7a}
+.callout.fw{border-color:#5a7a5a;background:linear-gradient(180deg,#f0f5ee,#e4eeda)}
+.callout.fw .label{color:#3a5a3a}
+.callout.perf{border-color:#8a6a1a;background:linear-gradient(180deg,#fdf6e3,#f5e8c0)}
+.callout.perf .label{color:#6a4a0a}
 
 /* Cards / panels */
 .panel{
@@ -527,6 +533,40 @@ hr.rule{border:none;height:1px;background:var(--line);margin:3rem auto;max-width
       <div class="label">✦ Why R3F for real estate?</div>
       <p>Premium studios — Zaha Hadid Architects, Adjaye Associates, Snøhetta — and luxury real estate marketers already use immersive 3D web experiences to differentiate properties. A candidate who can build these experiences with React Three Fiber is immediately valuable. This book prepares you to be that candidate.</p>
     </div>
+
+    <h3>Where Does an R3F Experience Actually Live?</h3>
+    <p>Before writing a single line of Three.js, you need to know where your work will be deployed. An R3F experience does not exist in a vacuum — it lives inside another product. Most luxury real estate sites are built in Framer or Webflow, not in a custom React application. Your 3D experience is a component inside that larger system. Understanding the deployment pattern from day one changes how you size components, host assets, manage state, and handle mobile.</p>
+
+    <p>There are four patterns you will encounter in professional work. Each chapter in this book includes a note on how the technique being taught affects whichever pattern your project uses.</p>
+
+    <div class="panel" style="margin:1.8rem 0">
+      <h4 style="margin-top:0;color:var(--ink)">Pattern A — Framer Code Component <span style="font-weight:400;font-size:.85em;color:var(--muted)">(most common for design studios)</span></h4>
+      <p style="margin-bottom:.6rem">Your R3F Canvas lives inside a Framer code component. The designer places it on the canvas like any other Framer element — dragging, resizing, connecting CMS properties. The component is deployed as part of the Framer site. This is the fastest path to a published experience with no backend.</p>
+      <p style="margin:0;font-size:.88rem;color:var(--muted)"><strong>Best when:</strong> The site is Framer-built. The developer is comfortable with React and TypeScript. CMS content is managed in Framer.</p>
+    </div>
+
+    <div class="panel" style="margin:1.8rem 0">
+      <h4 style="margin-top:0;color:var(--ink)">Pattern B — Webflow Custom Code Embed <span style="font-weight:400;font-size:.85em;color:var(--muted)">(most common for CMS-driven sites)</span></h4>
+      <p style="margin-bottom:.6rem">Your R3F application is built as a self-contained JavaScript bundle, hosted on a CDN, and bootstrapped into a target <code>&lt;div&gt;</code> via Webflow's custom code embed block. The Webflow site manages all other content; the 3D experience is injected at runtime.</p>
+      <p style="margin:0;font-size:.88rem;color:var(--muted)"><strong>Best when:</strong> The site is Webflow-built. The client team needs Webflow's CMS and Editor workflow. The 3D experience is a single embedded section, not the whole site.</p>
+    </div>
+
+    <div class="panel" style="margin:1.8rem 0">
+      <h4 style="margin-top:0;color:var(--ink)">Pattern C — Iframe / Externally Hosted <span style="font-weight:400;font-size:.85em;color:var(--muted)">(maximum isolation)</span></h4>
+      <p style="margin-bottom:.6rem">The R3F application runs at its own URL (e.g., <code>experience.aureliaresidences.com</code>) and is embedded in the marketing site via <code>&lt;iframe&gt;</code>. The host site and the 3D experience communicate via <code>window.postMessage</code>.</p>
+      <p style="margin:0;font-size:.88rem;color:var(--muted)"><strong>Best when:</strong> The experience is highly complex (multiple views, deep linking). The same experience must embed on multiple platforms. Complete CSS and JS isolation is required.</p>
+    </div>
+
+    <div class="panel" style="margin:1.8rem 0">
+      <h4 style="margin-top:0;color:var(--ink)">Pattern D — Hybrid React Application <span style="font-weight:400;font-size:.85em;color:var(--muted)">(full control)</span></h4>
+      <p style="margin-bottom:.6rem">The entire site is a custom React application. The 3D experience lives at a dedicated route (<code>/experience</code>) and is lazy-loaded. React Router handles navigation between the marketing pages and the 3D view.</p>
+      <p style="margin:0;font-size:.88rem;color:var(--muted)"><strong>Best when:</strong> The client needs a fully custom application. There is no platform constraint. The developer controls the full stack.</p>
+    </div>
+
+    <div class="callout prod">
+      <div class="label">🚀 What This Book Delivers</div>
+      <p>By Chapter 20, you will have built the Aurelia Residences 3D experience. Chapters 21–24 then show you how to package and deploy it: a Framer code component (Pattern A), a Webflow embed bundle (Pattern B), a complete asset pipeline (so your models are fast and professionally prepared), and a production architecture with analytics, accessibility, and client handoff documentation. The code skills and the deployment skills arrive together.</p>
+    </div>
   </div>
 </section>
 
@@ -562,6 +602,11 @@ hr.rule{border:none;height:1px;background:var(--line);margin:3rem auto;max-width
         <li><a href="#part5"><strong>Part V — Production and Capstone</strong></a></li>
         <li><a href="#ch19">Performance Optimization</a></li>
         <li><a href="#ch20">Capstone — The Aurelia Experience</a></li>
+        <li><a href="#part6"><strong>Part VI — Deployment &amp; Production Integration</strong></a></li>
+        <li><a href="#ch21">The Asset Pipeline — From Model to CDN</a></li>
+        <li><a href="#ch22">Framer Integration — Code Components &amp; Publishing</a></li>
+        <li><a href="#ch23">Webflow Integration — Embeds, CMS &amp; Scroll</a></li>
+        <li><a href="#ch24">Production Architecture, Analytics &amp; Client Handoff</a></li>
       </ol>
     </div>
   </div>
@@ -728,6 +773,17 @@ export default function App() {
     <p>
       Create a new file <code>src/experience/PropertyExperience.tsx</code> that exports a component identical to the App.tsx Canvas above. This component will be the dedicated home for your 3D experience and will be imported into the main page layout. Ensure the Canvas renders, the grey box is lit, and OrbitControls work. Test it by importing and rendering PropertyExperience in your main App or page.
     </p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality</div>
+    <p><strong>Canvas sizing in deployment:</strong> Never use fixed pixel dimensions on the Canvas wrapper in production. Use <code>style={{ width: '100%', height: '100%' }}</code> and let the parent container control the dimensions. In Framer, the component frame sets the size. In Webflow, the containing div sets it. A Canvas hardcoded to <code>1200 × 700px</code> will overflow its container on mobile and break responsive layouts. Set the parent to <code>position: relative; overflow: hidden</code> and the Canvas fills it perfectly at every viewport size.</p>
+    <p style="margin-bottom:0"><strong>Performance budget start:</strong> You have approximately 16ms per frame at 60fps. The grey cube scene uses about 1ms. Every technique in this book consumes some of those remaining 15ms. Track the budget as you add features — the DevTools Performance panel is your reference throughout the book.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow</div>
+    <p><strong>Framer:</strong> Your <code>PropertyExperience</code> component is the content of a Framer code component. In Chapter 22 you will add <code>addPropertyControls</code> to expose props to the Framer properties panel. For now, build as a standard React component — the Framer wrapper adds a thin layer around it. <strong>Webflow:</strong> In Chapter 23, this component becomes the React root mounted by an <code>initExperience()</code> function into a Webflow embed div. The component itself needs no Webflow-specific changes; the integration layer wraps around it. Write the component as if it knows nothing about its host platform — that is the correct architecture.</p>
   </div>
 </section>
 
@@ -929,6 +985,16 @@ export default function MaterialScene() {
     <p>
       Modify your PropertyExperience component from Chapter 1. Replace the single grey cube with a simple stylized building shape: use one <code>boxGeometry</code> for the main volume (like a rectangular residence footprint) and one <code>cylinderGeometry</code> for a tower or carport. Position them together using world coordinates. Ensure both cast and receive shadows. Use <code>meshStandardMaterial</code> with appropriate roughness and metalness for concrete/stone surfaces. Light it warmly. The building does not need to be pretty yet—just a basic massing using two primitives.
     </p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Texture Sourcing</div>
+    <p>Once you move beyond placeholder materials to real textures, you need a sourcing pipeline. Three sources cover most production needs: <strong>Poly Haven</strong> (polyhaven.com) — free, CC0-licensed PBR texture sets. All you need for concrete, marble, wood, metal. Download at 2K resolution. <strong>Quixel Bridge</strong> — free with an Unreal Engine account. Studio-quality scanned surfaces, usable in Three.js via GLB export. <strong>Poliigon</strong> — commercial licence, used by professional visualization studios. For texture file format: use <code>.webp</code> for colour/albedo maps (30–50% smaller than JPG at equivalent quality). Use <code>.png</code> for normal maps where lossless accuracy matters. In Chapter 21, you will add <code>.ktx2</code>/BasisU compression — the production standard that reduces texture memory on GPU by 4–6× compared to WebP.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow</div>
+    <p>Textures and models are <em>not</em> embedded in the Framer component or Webflow bundle. They are always hosted separately on a CDN and loaded at runtime. When you write <code>useTexture('/marble.webp')</code>, that URL must be absolute in production — <code>https://cdn.aureliaresidences.com/textures/marble-01-albedo-2k.webp</code>. A relative URL that works in your local dev server will 404 when the component is running inside a Framer or Webflow environment. Chapter 21 covers the full asset hosting strategy.</p>
   </div>
 </section>
 
@@ -1167,6 +1233,16 @@ export default function LitArchitecturalScene() {
       </ul>
       Test that the scene is well-lit, shadows are visible and not too dark or too bright, and the mood feels warm and architectural (not game-like). Iterate on light intensity and color until it feels premium.
     </p>
+  </div>
+
+  <div class="callout perf">
+    <div class="label">⏱ Performance Budget — Shadow Maps</div>
+    <p>Each shadow-casting light requires a full shadow map render pass — a second render of the scene from the light's point of view. On mobile, this costs 4–8ms per shadow light. The rule for production architectural scenes: <strong>one shadow-casting directional light maximum</strong>. All secondary lights use <code>castShadow={false}</code>. For interior surfaces that need contact shadows without a second light, use baked ambient occlusion textures (covered in Chapter 21). Set <code>shadow-mapSize={[1024, 1024]}</code> on your key light — the default 512 is visibly pixelated on hero architecture, but 2048 quadruples the memory cost with diminishing returns.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Baked Lighting</div>
+    <p>In production architectural visualization, the most common approach is <em>baked lighting</em>: static lighting (ambient occlusion, indirect bounces, shadow softness) is pre-computed in Blender and baked into the model's texture maps. The real-time lights in Three.js then handle only dynamic elements — a moving sun position for a time-of-day slider, hover highlights on hotspot meshes. This halves your per-frame lighting cost. Chapter 21 covers the Blender bake workflow that turns a lighting-heavy scene into a performant one.</p>
   </div>
 </section>
 
@@ -1411,6 +1487,12 @@ export default function GroupedBuildingScene() {
       Take your current PropertyExperience component and refactor it. Wrap all building geometry in a single <code>&lt;group&gt;</code> at the origin [0, 0, 0]. Position each piece (base, main volume, towers, glass element, roof) relative to that group's center. Ensure the entire structure is well-lit and casts proper shadows. This sets you up for camera animation and interaction in later chapters—being able to move and rotate the whole building as one object.
     </p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Units are Meters</div>
+    <p>One Three.js unit equals one meter — this is the universal convention and you should follow it. A 30-floor building is approximately 90 units tall. A camera at eye height sits at <code>y=1.7</code>. A standard door is 2.1 units high. Following this convention is not optional when you import architectural models: a Revit or ArchiCAD export at millimetre scale produces a building 0.001 units tall — invisible until you know why. When importing GLB files in Chapter 9, always check the bounding box dimensions. If the building is not roughly life-scale, apply a scale correction on the parent group.</p>
+    <p style="margin-bottom:0"><strong>Blender coordinate note:</strong> Blender uses Z-up; Three.js uses Y-up. The GLB exporter converts this automatically — but a model that was modelled in Blender's Z-up and not exported through the standard GLB pipeline may arrive rotated 90° on the X axis. The fix is always <code>rotation={[-Math.PI / 2, 0, 0]}</code> on the parent group.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch5">
@@ -1648,6 +1730,28 @@ export default function AnimatedArchitectureScene() {
       </ul>
       The animation should be barely noticeable—viewers should feel the building is alive, not that it is bobbing or spinning dramatically. Export PropertyExperience.tsx with this animated building as the default. This completes the foundational 3D experience for Aurelia Residences.
     </p>
+  </div>
+
+  <div class="callout perf">
+    <div class="label">⏱ Performance Budget — useFrame Best Practices</div>
+    <p>Three rules that prevent the most common performance bugs in production R3F code:</p>
+    <p><strong>1. Never create objects inside useFrame.</strong> <code>new Vector3()</code> inside a <code>useFrame</code> callback allocates a new object 60 times per second. JavaScript's garbage collector will visibly stutter the frame rate as it cleans these up. Create all vectors, quaternions, and matrices once with <code>useRef</code> outside the callback, then reuse them inside it.</p>
+    <p><strong>2. Always use delta-based animation.</strong> <code>mesh.rotation.y += 0.01</code> runs at different speeds on a 30fps phone and a 120fps desktop. Use <code>useFrame((state, delta) =&gt; { mesh.rotation.y += 0.5 * delta; })</code> — speed × delta is frame-rate independent.</p>
+    <p style="margin-bottom:0"><strong>3. Pause when off-screen.</strong> When the 3D experience is scrolled out of view (in a scroll-driven layout) or the browser tab is in the background, the loop should not run. In Chapter 19, you will add an Intersection Observer that pauses the loop when the canvas is not visible.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow</div>
+    <p><strong>Reduced motion:</strong> In both Framer and Webflow deployments, some users will have <code>prefers-reduced-motion: reduce</code> set in their operating system. This is an accessibility signal that animations should be minimized or eliminated. In Chapter 13, you will add a global check for this setting and disable <code>useFrame</code> animations accordingly. Design your idle animations so they have a graceful no-animation fallback — the building looks complete and professional as a static scene, and motion is an enhancement, not a requirement.</p>
+  </div>
+</section>
+
+<!-- ================ PART II HEADER ================ -->
+<section class="part-header" id="part2">
+  <div class="wrap">
+    <span class="part-num">Part Two</span>
+    <h2>Building Spatial Interfaces</h2>
+    <p class="part-desc">Chapters 6–10 move from a static scene to a fully interactive one. You will add raycasting, HTML overlays, multi-scene navigation, animation state machines, and global scene state — everything required to turn a rendered space into an experience users can explore.</p>
   </div>
 </section>
 
@@ -1942,6 +2046,25 @@ export default InteractiveArchitectureScene;</code></pre>
       </ul>
       Use the HotspotSphere component pattern. Test that clicking works and the panel appears. This sets up the interactivity foundation for the full Aurelia experience.
     </p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — CMS-Connected Hotspots</div>
+    <p>Hardcoded hotspot data is a maintenance problem. When a client adds a new residence feature, they should not need a code deployment. The production pattern is a <em>config-driven</em> hotspot system: all position, label, and content data lives in a config object (or a CMS fetch) that is separate from the component code. Start building this habit now — even with static data:</p>
+    <pre><code>const HOTSPOT_CONFIG = [
+  { id: 'lobby',  position: [-4, 6, 0] as [number,number,number], label: 'Grand Lobby',  body: 'Triple-height entrance...' },
+  { id: 'garden', position: [ 0, 5, 0] as [number,number,number], label: 'Private Garden', body: 'South-facing terrace...' },
+  { id: 'roof',   position: [ 2, 8, 1] as [number,number,number], label: 'Rooftop Terrace', body: 'Panoramic city views...' },
+];
+
+// Then render from config — no hardcoded positions in JSX:
+{HOTSPOT_CONFIG.map(h =&gt; &lt;Hotspot key={h.id} {...h} /&gt;)}</code></pre>
+    <p style="margin-bottom:0">In Chapter 16, this config object gets replaced with a live CMS fetch. The component itself never changes.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow</div>
+    <p><strong>Touch events:</strong> <code>onPointerEnter</code> does not fire on touch screens — there is no "hovering finger." Design hotspots so that the primary action is <code>onClick</code> (which fires reliably on both mouse click and finger tap). Hover colour change is a desktop enhancement, not a requirement. <strong>Hit area sizing:</strong> A 0.3-unit sphere looks crisp on screen but is nearly impossible to tap precisely on a mobile display. Wrap each visible hotspot in a larger invisible mesh (<code>visible={false}</code>, ~1 unit sphere) that captures the pointer event. The visible indicator is purely cosmetic — the hit target is generous.</p>
   </div>
 </section>
 
@@ -2253,6 +2376,12 @@ export default HtmlInSceneExample;</code></pre>
       This replaces the external UI with embedded 3D information, making the experience more immersive and unified.
     </p>
   </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — &lt;Html&gt; Conflicts</div>
+    <p><strong>Framer:</strong> Drei's <code>&lt;Html&gt;</code> injects DOM elements using a portal into the Canvas parent element. In Framer, this can conflict with Framer's own portal management and z-index stacking. Always test <code>&lt;Html&gt;</code> overlays on the <em>published</em> Framer site — not just the canvas preview. If panels appear behind other Framer elements, add the <code>zIndexRange={[100, 0]}</code> prop to control the stacking order explicitly.</p>
+    <p style="margin-bottom:0"><strong>Webflow:</strong> Webflow applies a global CSS reset: <code>* &#123; box-sizing: border-box &#125;</code> and strips margin/padding from many elements. Styles inside <code>&lt;Html&gt;</code> are real DOM and inherit these globals. Always scope your hotspot panel CSS with a high-specificity wrapper class (e.g., <code>.aurelia-hotspot-panel</code>) and declare all layout properties explicitly — do not rely on browser defaults that Webflow resets.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch8">
@@ -2543,6 +2672,21 @@ export default CameraControlScene;</code></pre>
       Clicking a button should smoothly animate the camera to that position over ~2 seconds. Implement lerp with a delta-independent speed. OrbitControls should still work so users can take over camera control after a preset.
     </p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — The CameraRig Pattern</div>
+    <p>As the camera system grows (presets in Ch8, scroll-driven in Ch17, hotspot focus in Ch16), spreading camera logic across multiple <code>useFrame</code> hooks and components becomes unmaintainable. The production pattern is a single <code>CameraRig</code> component with named positions and a unified animation state:</p>
+    <pre><code>// src/experience/camera/CameraRig.tsx
+// Reads desired position from Zustand store, lerps to it every frame
+// All camera commands go through the store: useCameraStore.getState().navigateTo('overview')
+// One component — all camera behaviour</code></pre>
+    <p style="margin-bottom:0">Start building toward this pattern now, even if the implementation is simple. In the capstone, all four camera systems (presets, scroll, hotspot, intro) will share this single rig. The architecture chapter (Ch24) shows the full file structure.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — Mobile Camera Constraints</div>
+    <p>On mobile, unrestricted OrbitControls creates problems: users accidentally flip the camera upside-down, pan the building out of frame, or zoom too close to see anything. Add these constraints for all mobile deployments: <code>maxPolarAngle={Math.PI * 0.8}</code> (prevents flipping over the top), <code>minDistance={8}</code> (prevents zooming inside the model), <code>maxDistance={60}</code> (prevents panning too far away), and reduce <code>rotateSpeed={0.5}</code> for comfortable touch-drag speed. In Framer and Webflow embeds, check <code>window.innerWidth &lt; 768</code> on mount and conditionally apply these constraints.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch9">
@@ -2768,6 +2912,17 @@ useGLTF.preload(
       </ul>
       This transforms PropertyExperience from a geometry exercise into a true architectural visualization tool.
     </p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Model Sourcing &amp; Blender Cleanup</div>
+    <p>Where does the production model come from? The options, in order of increasing cost and quality: <strong>Sketchfab</strong> (free and commercial CC-licensed models — good starting point for concept projects). <strong>BIM export</strong> (from Revit, ArchiCAD, or Vectorworks via IFC-to-GLB pipeline — accurate but heavy, requires cleanup). <strong>Custom Blender modelling</strong> (highest control, most effort). <strong>Purchased assets</strong> from TurboSquid or CGTrader.</p>
+    <p style="margin-bottom:0">Every model needs a <strong>Blender cleanup pass</strong> before it is ready for the web: merge duplicate vertices, apply all transforms, remove non-visible geometry, limit materials to 4–8 per object, apply all modifiers, and check normals. Raw exports are routinely 50–200MB. After cleanup and Draco compression, the same model is typically 2–8MB. Chapter 21 walks through the full pipeline step by step.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Poster Frame During Load</div>
+    <p>A blank black canvas during model load is the standard developer experience. It is not acceptable in a luxury real estate deployment. The production pattern is a <em>poster frame</em>: a static WebP image (rendered from Blender or captured from the loaded scene) that matches the initial camera position and is shown while the GLB loads. Once <code>useGLTF</code> resolves, the poster crossfades out and the live scene appears. This is the technique used by every professional architectural visualization studio. Implementation: wrap the Canvas in a relative-positioned container; position the poster image absolutely inside it; fade it out when the loading <code>&lt;Suspense&gt;</code> fallback finishes. Chapter 22/23 show the full integration in Framer and Webflow.</p>
   </div>
 </section>
 
@@ -3094,6 +3249,23 @@ export default InfoPanel;</code></pre>
       The goal: all UI and 3D components are now synchronized through a single source of truth. Users can click hotspots, see the camera animate, and panels open—all coordinated by the store. This completes the foundational interactive architecture of the Aurelia experience.
     </p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — CMS-Fed Store &amp; URL State</div>
+    <p><strong>CMS-fed initial state:</strong> In production, the hotspot data that populates your Zustand store does not come from a static TypeScript file — it comes from a CMS fetch. Populate the store from a <code>useEffect</code> in the top-level Experience component:</p>
+    <pre><code>useEffect(() =&gt; {
+  fetch(config.cmsEndpoint)
+    .then(r =&gt; r.json())
+    .then(data =&gt; useExperienceStore.setState({ hotspots: mapCMSItems(data) }))
+    .catch(() =&gt; useExperienceStore.setState({ hotspots: STATIC_FALLBACK }));
+}, []);</code></pre>
+    <p><strong>URL-driven state:</strong> A sales team needs to share links to specific views. A buyer who opens a link should land with a specific hotspot already selected and the camera already positioned. Implement this by reading URL search params on mount and setting store state accordingly: <code>?hotspot=lobby</code> → <code>selectHotspot('lobby')</code>. This is a commercial requirement for luxury real estate — direct links to specific residences dramatically improve sales team workflows.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow</div>
+    <p>In Framer, the Zustand store is scoped to a single component instance. If you have two <code>AureliaExperience</code> components on the same Framer page (e.g., a preview thumbnail and a full-size embed), they each get their own store — which is the correct behaviour. In Webflow, if the bootstrap script runs twice (because an embed block appears twice on the page), two React roots will be created. Each has its own store. Prevent this by adding a guard in the bootstrap: <code>if (container.dataset.initialized) return; container.dataset.initialized = 'true';</code></p>
+  </div>
 </section>
 
 <!-- SKILL MAP: PARTS I + II -->
@@ -3263,6 +3435,16 @@ export function CameraRig() {
     <p>3. Create a simple UI (a row of three buttons) in PropertyExperience that calls setActiveShot('overview'), setActiveShot('entrance'), and setActiveShot('terrace').</p>
     <p>4. Test that clicking each button smoothly transitions the camera to the correct position.</p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Shot Design for Mobile</div>
+    <p>Shots designed on a 1440px desktop monitor can break on a 375px phone. The key issue is field of view and composition: a narrow FOV shot that frames the building elegantly at desktop width may clip both sides of the building on mobile. The production rule: <strong>design shots at mobile width first</strong>. If the building is fully visible at 375px with the chosen FOV, it will look even better on desktop. Use a slightly wider FOV on mobile (add 10–15°) and a slightly higher camera position to compensate for the taller aspect ratio of a portrait screen.</p>
+  </div>
+
+  <div class="fw callout">
+    <div class="label">🔷 Framer &amp; Webflow — Disable Controls During Scripted Movement</div>
+    <p>When a scripted camera animation is running (triggered by a button click or a scroll position), <code>OrbitControls</code> must be temporarily disabled. If it remains enabled, user touch-drag fights the animation and the camera vibrates unpredictably. Toggle the <code>enabled</code> prop: set it to <code>false</code> when an animation starts and back to <code>true</code> when it finishes. In the <code>CameraRig</code> pattern, this is managed by the Zustand store: <code>isCameraAnimating</code> state controls the <code>enabled</code> prop on OrbitControls.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch12">
@@ -3387,6 +3569,16 @@ export function LightingRig({ mood = 'afternoon' }: LightingRigProps) {
     <p>3. In PropertyExperience, pass the mood prop to LightingRig: &lt;LightingRig mood={mood} /&gt;.</p>
     <p>4. Add a UI row (three buttons or a dropdown) to toggle mood between 'morning', 'afternoon', and 'evening'.</p>
     <p>5. Observe how the entire scene transforms with each mood. This is cinema in code.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — HDRI Sourcing &amp; Optimization</div>
+    <p>Environment maps (HDRI) are the single most impactful way to make materials look photorealistic — and the most common source of slow loads. A raw download from Poly Haven (polyhaven.com) is 20–50MB. Production requires resizing to 1024×512 pixels for reflection-only use, or 2048×1024 if the HDRI is also the visible background. The resizing workflow: open in Blender's Image Editor → Image → Scale → export as <code>.hdr</code>. Alternatively, use the <code>sharp</code> CLI: <code>sharp input.hdr -o output-1k.hdr --width 1024</code>. The resized HDRI typically weighs 200–500KB — a 100× reduction. Always host HDRIs on CDN with long cache headers; they never change.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — Time of Day as a Sellable Feature</div>
+    <p>The morning/afternoon/evening mood toggle is not a developer experiment — it is a sales feature. A luxury buyer browsing in the evening wants to see the property in warm evening light. Let them choose. In Framer, expose <code>defaultMood</code> as a <code>ControlType.Enum</code> property so the designer can set the initial mood per-page. In Webflow, read it from a data attribute on the container div: <code>data-mood="afternoon"</code>, which the content team can set per-page in the Webflow Designer without any code changes.</p>
   </div>
 </section>
 
@@ -3656,6 +3848,25 @@ return (
     <p>6. Set document.body.style.height = '300vh' when scroll mode is active.</p>
     <p>7. Test: scroll the page and observe the camera moving smoothly through the three waypoints (overview → entrance → terrace). The experience should feel guided and editorial, not rushed.</p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — prefers-reduced-motion</div>
+    <p>This is the single most important accessibility rule for animated 3D content — and it is absent from most R3F tutorials. Some users set <code>prefers-reduced-motion: reduce</code> in their OS because animation triggers vestibular disturbance or motion sickness. For these users, a scroll-driven camera that sweeps through a building is not a premium experience — it is a health problem.</p>
+    <p>Add this to your Zustand store once, on mount, and check it everywhere:</p>
+    <pre><code>// In your store initialization or top-level Effect:
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+useExperienceStore.setState({ reducedMotion: prefersReduced });
+
+// In useScrollCamera and useFrame animations:
+const reducedMotion = useExperienceStore(s =&gt; s.reducedMotion);
+if (reducedMotion) return; // skip all frame-by-frame animation</code></pre>
+    <p style="margin-bottom:0">The scene remains fully visible and interactive when <code>reducedMotion</code> is true — hotspots still open, camera presets still work via instant position set rather than lerp. Motion becomes an enhancement, not a requirement.</p>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — Scroll Conflicts</div>
+    <p><strong>Framer:</strong> If the 3D component is inside a Framer page that also has scroll-linked animations (Framer's built-in scroll effects), the R3F scroll listener and Framer's scroll listener will both fire on the same wheel events. Isolate the R3F scroll experience in a fixed-height container with <code>overflow: hidden</code> so Framer's page scroll and the 3D scroll are completely separate scroll containers. <strong>Webflow:</strong> Webflow's IX2 Interactions and the R3F scroll listener both listen on <code>wheel</code>. The conflict appears as jerky IX2 animations when the user scrolls near the 3D embed. The solution: do not use scroll-hijacking in the R3F scene when it lives inside a Webflow page with IX2. Use internal drag/touch interaction within the canvas boundary instead of page scroll. Chapter 23 shows the full implementation.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch14">
@@ -3806,6 +4017,28 @@ import { Sky } from '@react-three/drei';
     <p>4. Add &lt;fog attach="fog" args={['#e8e0d0', 50, 150]} /&gt; for atmospheric depth.</p>
     <p>5. Observe: the scene should now feel like it exists in a real space with natural light and air. The materials should reflect the HDRI. This is the moment your scene stops looking like a demo and starts looking like premium content.</p>
   </div>
+
+  <div class="callout perf">
+    <div class="label">⏱ Performance Budget — Postprocessing &amp; GPU Tiers</div>
+    <p>Postprocessing effects (Bloom, DepthOfField, ChromaticAberration from <code>@react-three/postprocessing</code>) are expensive — they run an additional render pass on every frame. DepthOfField alone can cost 4–6ms on a mid-range GPU. The production rule: <strong>conditional postprocessing based on GPU tier</strong>.</p>
+    <p>Use <code>@react-three/detect-gpu</code> to detect capability at runtime:</p>
+    <pre><code>import { getGPUTier } from 'detect-gpu';
+
+const tier = await getGPUTier(); // returns { tier: 0 | 1 | 2 | 3 }
+// tier 0 = mobile/low-end: no postprocessing
+// tier 1 = mid-range mobile: bloom only at low intensity
+// tier 2+ = desktop: full EffectComposer pipeline</code></pre>
+    <p style="margin-bottom:0">Wrap <code>&lt;EffectComposer&gt;</code> in a component that reads the GPU tier from Zustand and returns <code>null</code> for tiers 0 and 1. Chapter 18 shows the complete conditional architecture.</p>
+  </div>
+</section>
+
+<!-- ================ PART IV HEADER ================ -->
+<section class="part-header" id="part4">
+  <div class="wrap">
+    <span class="part-num">Part Four</span>
+    <h2>Premium Real Estate Applications</h2>
+    <p class="part-desc">Chapters 15–18 apply everything learned so far to a real-world brief: an architectural showcase for a luxury residential development. You will study the art direction principles that distinguish premium from ordinary, build a full hotspot and narrative system, implement dynamic time-of-day lighting, and create resilient mobile fallbacks — producing a scene that is both beautiful and production-deployable.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch15">
@@ -3929,6 +4162,12 @@ Ask yourself: Does this look like a premium brand website, or a tech demo?
     <p>2. Identify the top 3 areas where your scene falls short of "premium."</p>
     <p>3. Fix those three areas. (This might mean adjusting material properties, repositioning lights, slowing down camera animation, etc.)</p>
     <p>4. Compare before and after. The difference should be striking.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Justifying the Budget</div>
+    <p>At some point a client or product owner asks: "Why is this so expensive?" Premium vs. spectacle is your answer. Spectacle is visual complexity — particle systems, constant movement, dozens of animated elements. It impresses in a demo and exhausts in a real use context. Premium is intentional restraint — slow movement, generous empty space, exceptional material quality, deliberate camera position. Premium is harder to build and harder to understand without training. It is also what the target buyer of a £4.5M property actually responds to. Your job is to know the difference and deliver the second.</p>
+    <p style="margin-bottom:0"><strong>In a client conversation:</strong> "We are not building a game environment. We are building a digital equivalent of the architectural photography in the sales brochure — where every frame was chosen by a photographer, not generated randomly. The 3D experience should feel like that photography, interactive."</p>
   </div>
 </section>
 
@@ -4194,6 +4433,25 @@ export function HotspotManager() {
     <p>5. Test: hover over each hotspot to see the label change, click to see the detail panel.</p>
     <p>6. Integrate HotspotManager into PropertyExperience.tsx so hotspots are visible in the scene.</p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — CMS-Connected Hotspots</div>
+    <p>The hotspot data above is hardcoded. In production, content teams need to update it without a code deployment. Replace the static array with a fetched config — and add a static fallback for when the fetch fails:</p>
+    <pre><code>const [hotspots, setHotspots] = useState&lt;HotspotData[]&gt;(STATIC_HOTSPOT_FALLBACK);
+
+useEffect(() =&gt; {
+  fetch(config.hotspotsEndpoint)
+    .then(r =&gt; r.json())
+    .then(data =&gt; setHotspots(data.items.map(mapCMSToHotspot)))
+    .catch(() =&gt; { /* keep static fallback, log warning */ });
+}, []);</code></pre>
+    <p style="margin-bottom:0">The <code>hotspotsEndpoint</code> is a Framer CMS collection endpoint or a Webflow Data API v2 URL. The <code>mapCMSToHotspot</code> function translates the CMS item shape to your internal <code>HotspotData</code> interface. Chapter 22 and 23 show the specific endpoint patterns for each platform.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — The Guided Tour Pattern</div>
+    <p>A guided tour is a sequential mode where clicking "Next Hotspot" advances through the property in a defined order, moving the camera to each one. Sales teams use this to walk remote buyers through a property over a video call. Implementation: add a <code>tourIndex</code> to Zustand; the "Next" button increments it and calls <code>navigateTo(HOTSPOT_CONFIG[tourIndex].cameraTarget)</code>. A URL parameter (<code>?tour=true&amp;step=2</code>) lets the sales team share a link to a specific step. This is not a demo feature — it is a sales workflow feature.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch17">
@@ -4449,6 +4707,12 @@ export function HotspotManager() {
     <p>5. In scroll mode, set document.body.style.height = '300vh' and disable OrbitControls.</p>
     <p>6. Test: switch to scroll mode, scroll the page from top to bottom, and observe the camera smoothly transition from overview to entrance to terrace. The experience should feel cinematic and guided.</p>
   </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — Scroll Isolation Architecture</div>
+    <p><strong>Framer:</strong> Framer's built-in scroll-linked animations and R3F's scroll listener both consume the <code>wheel</code> event. To prevent conflict, give the 3D component a fixed height and set <code>overflow: hidden</code> on its container frame in Framer. The 3D component's internal scroll drive lives in a separate scroll container from Framer's page scroll — they never share the same scroll axis.</p>
+    <p style="margin-bottom:0"><strong>Webflow:</strong> Webflow IX2 animations listen on the page-level scroll. When an R3F embed is on the same page and in scroll-hijacking mode, IX2 timelines stutter as the two systems compete. The production solution for Webflow: <strong>do not use scroll-hijacking mode</strong>. Instead, drive the camera narrative from internal canvas drag/touch interaction (the user drags inside the canvas to advance the narrative), while Webflow's page scroll works independently for the surrounding marketing content. Chapter 23 shows this pattern in full.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch18">
@@ -4691,6 +4955,32 @@ import { AdaptiveDpr } from '@react-three/drei';
     <p>4. Set dpr={[1, 2]} and adjust pixelRatio based on device.</p>
     <p>5. Test on a mobile device (or use Chrome DevTools device emulation). The mobile view should load instantly with a static image. Desktop should still have the full experience.</p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Three Degradation Tiers</div>
+    <p>Binary mobile/desktop detection is a starting point, not a production strategy. GPU capability varies enormously — a 2023 iPad Pro outperforms a 2019 desktop. Production uses three tiers based on actual GPU capability:</p>
+    <p><strong>Tier 1 (capable mobile + desktop):</strong> Full scene, conditional postprocessing only. Identified by <code>getGPUTier().tier ≥ 1</code>.</p>
+    <p><strong>Tier 2 (mid-range mobile):</strong> Static mesh (no idle animation), single directional light, no shadows, touch orbit only. <code>getGPUTier().tier === 0</code>.</p>
+    <p><strong>Tier 3 (no WebGL2 / reduced-motion):</strong> No Canvas at all. Poster image + property carousel + enquiry CTA. Check <code>supportsWebGL2()</code> first; if false, skip the R3F import entirely. If <code>prefers-reduced-motion</code> is true and the scene is animation-heavy, default to Tier 3.</p>
+    <pre><code>function supportsWebGL2(): boolean {
+  try { return !!document.createElement('canvas').getContext('webgl2'); }
+  catch { return false; }
+}</code></pre>
+  </div>
+
+  <div class="callout fw">
+    <div class="label">🔷 Framer &amp; Webflow — Poster Frame Integration</div>
+    <p>The poster frame (static image shown during load) is the most visible quality signal in a luxury real estate 3D experience. In Framer: add a poster image layer behind the 3D component frame in the canvas. Use a Framer variable (<code>isSceneLoaded</code>) set by the code component's <code>onLoaded</code> callback prop to trigger a Framer interaction that fades out the poster. In Webflow: position a poster image div absolutely within the container div using Webflow's position controls; use a small JS embed that adds a <code>loaded</code> class to the container when the R3F component fires a custom event, and use a CSS transition (<code>opacity: 0</code>) on the poster when that class is present.</p>
+  </div>
+</section>
+
+<!-- ================ PART V HEADER ================ -->
+<section class="part-header" id="part5">
+  <div class="wrap">
+    <span class="part-num">Part Five</span>
+    <h2>Production and Capstone</h2>
+    <p class="part-desc">Chapters 19–20 close the main curriculum with the skills studios actually ship with: bundle auditing, draw-call reduction, texture budgeting, and a full-scale capstone project that integrates every system built across the book into one coherent, client-ready scene.</p>
+  </div>
 </section>
 
 <section class="chapter" id="ch19">
@@ -4895,6 +5185,19 @@ useFrame(() =&gt; {
     <p>4. If model file &gt; 5MB, compress it with Draco: gltf-transform optimize aurelia.glb aurelia-opt.glb --compress draco</p>
     <p>5. If FPS &lt; 50, disable shadows or reduce the HDRI resolution.</p>
     <p>6. Target: 60fps on desktop, 30fps on mobile, draw calls &lt; 50.</p>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — CDN Hosting &amp; Lazy Loading</div>
+    <p><strong>CDN hosting:</strong> Never serve models and textures from the same server as your application. Use Cloudflare R2, AWS S3 + CloudFront, or any static asset CDN. Configure long-lived cache headers: <code>Cache-Control: public, max-age=31536000, immutable</code>. Use versioned filenames (<code>aurelia-lobby-v3.glb</code>) rather than cache-busting query strings — immutable assets cache forever and are never re-fetched.</p>
+    <p><strong>Lazy-loaded R3F module:</strong> The entire R3F import, Three.js, and all model code must <em>not</em> appear in the initial JavaScript bundle. Use <code>React.lazy()</code> so the 3D code only downloads when the user navigates to the experience route (Pattern D) or when the component scrolls into view (Patterns A, B, C):</p>
+    <pre><code>const AureliaExperience = lazy(() =&gt; import('./experience/AureliaExperience'));
+
+// Wrapping in Suspense shows the poster frame until the JS chunk loads:
+&lt;Suspense fallback={&lt;PosterFrame /&gt;}&gt;
+  &lt;AureliaExperience /&gt;
+&lt;/Suspense&gt;</code></pre>
+    <p style="margin-bottom:0"><strong>Development diagnostic:</strong> During development, add <code>gl.info</code> monitoring to a dev-only overlay: <code>const &#123; gl &#125; = useThree(); gl.info.render.calls</code> (draw calls), <code>gl.info.memory.geometries</code>, <code>gl.info.memory.textures</code>. This is your live dashboard during optimization.</p>
   </div>
 </section>
 
@@ -5387,6 +5690,71 @@ export default App;
     <div class="label">⌂ Real Estate Application</div>
     <p>This capstone project is a portfolio piece that demonstrates production-grade web 3D skills. You can use it to pitch 3D experiences to luxury real estate firms, architecture studios, and hospitality brands. The combination of technical excellence (clean code, performance, mobile support) and design sophistication (cinematic camera, mood lighting, editorial pacing) is what separates student projects from professional work. You now have both.</p>
   </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — The Three-Tier Architecture</div>
+    <p>The capstone experience ships in three tiers based on the visiting device's GPU capability, not a binary mobile/desktop check:</p>
+    <p><strong>Tier 1 — Full Experience</strong> (GPU tier ≥ 1 + WebGL2 supported): Full model, three-point lighting + HDRI, conditional bloom, scroll-driven camera narrative (6 waypoints), CMS-connected hotspot system (8 hotspots), time-of-day toggle, orbit controls after narrative, enquiry CTA at narrative end.</p>
+    <p><strong>Tier 2 — Simplified Experience</strong> (GPU tier 0 + WebGL2 supported): Reduced-polygon LOD model, ambient + single directional light, no postprocessing, no scroll camera (tap-to-navigate presets instead), hotspot system intact, touch orbit controls, fixed-bottom enquiry CTA.</p>
+    <p><strong>Tier 3 — No-Canvas Fallback</strong> (no WebGL2, or <code>prefers-reduced-motion</code> is set): No Canvas loaded at all. Architectural hero image, property feature carousel, enquiry button — all WCAG AA compliant. Three.js is never imported in this path, keeping the initial bundle clean.</p>
+    <pre><code>// src/experience/Experience.tsx — root component
+export function Experience() {
+  const [tier] = useState(() =&gt; detectExperienceTier()); // runs once on mount
+
+  if (tier === 'none') return &lt;FallbackExperience /&gt;;
+  if (tier === 'simplified') return &lt;SimplifiedExperience /&gt;;
+  return &lt;FullExperience /&gt;;
+}</code></pre>
+  </div>
+
+  <div class="callout prod">
+    <div class="label">🚀 Production Reality — Analytics for 3D Experiences</div>
+    <p>Tracking user behaviour in a 3D experience gives the client the same conversion data they expect from any marketing page. Add these five events to every capstone deployment:</p>
+    <pre><code>// On scene loaded:
+trackEvent('aurelia_scene_loaded', { duration_ms, experience_tier, device_type });
+
+// On hotspot opened:
+trackEvent('aurelia_hotspot_opened', { hotspot_id, hotspot_label });
+
+// On narrative completed (user reaches final scroll waypoint):
+trackEvent('aurelia_narrative_completed', { time_to_complete_seconds });
+
+// On enquiry CTA clicked:
+trackEvent('aurelia_enquiry_cta_clicked', { source: 'narrative_end' | 'hotspot' | 'fixed_bar' });
+
+// On Tier-3 fallback shown:
+trackEvent('aurelia_fallback_shown', { reason: 'no_webgl2' | 'reduced_motion' });</code></pre>
+    <p style="margin-bottom:0">The difference between <code>aurelia_scene_loaded</code> count and <code>aurelia_enquiry_cta_clicked</code> count is your 3D-to-enquiry conversion rate. This is the number your client will ask about.</p>
+  </div>
+
+  <h3>The Handoff Package</h3>
+  <p>A studio-grade deliverable includes three documents alongside the code: a technical spec (what was built, how assets are updated, where files live), a content guide (how the marketing team updates hotspot content without a developer), and a performance baseline (measured load time, frame time on the target mobile device, CDN configuration).</p>
+
+  <div class="callout key">
+    <div class="label">★ Handoff Checklist — For the Development Team</div>
+    <p><strong>Assets:</strong> All models versioned (<code>aurelia-lobby-v1.glb</code>), hosted at [CDN URL], with <code>Cache-Control: immutable</code>. Updating a model: export → Draco compress → upload with incremented version → update <code>sceneConfig.ts</code>.</p>
+    <p><strong>Configuration:</strong> All tunable values (CDN base URL, CMS endpoint, default mood, hotspot positions) live in <code>src/experience/config/sceneConfig.ts</code>. No values are hardcoded in component files.</p>
+    <p><strong>Degradation:</strong> Tier detection runs automatically. No separate mobile build. No feature flags to toggle.</p>
+    <p><strong>Analytics:</strong> All five events fire via the <code>trackEvent</code> wrapper. Replace the console.log stub with real GA4 <code>gtag</code> calls by setting <code>config.analyticsEnabled = true</code>.</p>
+    <p><strong>Deployment targets:</strong> Chapters 22 and 23 cover Framer code component and Webflow embed bundle respectively. Both use this same codebase — the integration layer wraps around it.</p>
+  </div>
+
+  <div class="callout key">
+    <div class="label">★ Handoff Checklist — For the Marketing Team</div>
+    <p><strong>Hotspot content:</strong> Editable via the Framer CMS or Webflow CMS with no code changes. Adding a new hotspot requires one new CMS item plus a position coordinate supplied by the development team.</p>
+    <p><strong>Poster frame images:</strong> Replaced by uploading a new WebP to the CDN at the same filename. No deployment required.</p>
+    <p><strong>Time of day default:</strong> Set via the Framer properties panel (property: <code>defaultMood</code>) or a Webflow data attribute (<code>data-mood="afternoon"</code>).</p>
+    <p><strong>Mobile fallback carousel:</strong> Content-managed via the same CMS collection as the hotspot data. No developer involvement for content updates.</p>
+  </div>
+
+  <div class="callout portfolio">
+    <div class="label">⌂ Portfolio Presentation</div>
+    <p><strong>Lead with the commercial outcome, not the technology.</strong> "An interactive 3D property experience that increased viewing requests by 34% by letting remote buyers navigate the property before booking" is a stronger portfolio statement than "a React Three Fiber application with HDRI lighting and scroll-driven camera choreography." The technology is implicit in the result.</p>
+    <p><strong>In a client proposal:</strong> "We are building a digital equivalent of the architectural photography in your sales brochure — where every frame was chosen deliberately, every surface is rendered in photorealistic light, and the buyer controls where they look. It runs in your existing Framer site as a component. Your marketing team can update the content. It works on every device."</p>
+    <p style="margin-bottom:0"><strong>Scope management:</strong> Quote the Tier-3 fallback separately (approximately 30% of total effort). Quote the CMS connection separately. The core 3D experience and the Framer/Webflow integration are the standard deliverable. Everything else is additive scope with additive value.</p>
+  </div>
+
+  <p>Chapters 21 through 24 complete the deployment layer: the asset pipeline that turns a raw model into a CDN-ready GLB, the Framer code component that packages this experience for a design studio, the Webflow embed bundle for CMS-driven sites, and the production architecture guide that makes the codebase maintainable after handoff.</p>
 </section>
 
 <!-- SKILL MAP: ALL 5 PARTS -->
@@ -5579,5 +5947,730 @@ document.querySelectorAll('section, .diagram, .callout, .panel').forEach(el => {
 })()
 
 </script>
+
+<!-- PART VI HEADER -->
+<section class="part-header" id="part6">
+  <div class="wrap">
+    <span class="part-num">Part Six</span>
+    <h2>Deployment &amp; Production Integration</h2>
+    <p class="part-desc">Chapters 21–24 close the gap between a working R3F experience and a shipped product. You will build a complete asset pipeline, package the experience as a Framer code component and a Webflow embed bundle, and produce a maintainable production architecture with analytics, accessibility, and a client handoff package.</p>
+  </div>
+</section>
+
+<!-- ================ CH21 ================ -->
+<section class="chapter" id="ch21">
+  <div class="chap-head">
+    <span class="num">21</span>
+    <h2>The Asset Pipeline — From Model to CDN</h2>
+  </div>
+
+  <p>What you will build: A complete, repeatable pipeline that takes a raw architectural model from any source and produces a web-ready GLB with Draco compression, optimized textures in WebP/KTX2 format, a resized HDRI, and a CDN hosting configuration with correct cache headers. This is the workflow used by professional visualization studios — and it is the most common gap between a working R3F demo and a deployable product.</p>
+
+  <h3>21.1 Model Sourcing</h3>
+  <p>Where does the production model come from? The options, in order of increasing quality and effort:</p>
+
+  <p><strong>Sketchfab:</strong> The largest library of 3D models on the web. Free models use CC0 or CC-BY licences; always check the licence before using in a commercial project. Search for "apartment building," "modernist house," or "luxury residence." Download as GLB. Polygon counts vary wildly — check that the model is under 500K triangles before committing.</p>
+
+  <p><strong>BIM export:</strong> Revit, ArchiCAD, and Vectorworks all export to IFC. Convert IFC to GLB via BlenderBIM or IfcOpenShell + Blender. This gives you an accurate architectural model, but raw BIM exports are heavy (often 50–200MB) and need significant cleanup. Use for final client deliverables only, not for early development.</p>
+
+  <p><strong>Purchased assets:</strong> TurboSquid, CGTrader, and Fab (Epic's marketplace) sell studio-quality architectural models at prices ranging from $30 to $800. Most are provided in FBX or OBJ format — convert to GLB via Blender.</p>
+
+  <p><strong>Custom Blender modelling:</strong> Full control, maximum effort. For concept projects and portfolio pieces, modelling the Aurelia building from reference drawings in Blender is a valuable skill that makes you self-sufficient on client projects.</p>
+
+  <h3>21.2 The Blender Cleanup Checklist</h3>
+  <p>Every model — regardless of source — needs a cleanup pass in Blender before export. Raw exports are reliably broken in at least one of these ways:</p>
+
+  <ol>
+    <li><strong>Apply all transforms.</strong> Select all objects → Object → Apply → All Transforms. Un-applied transforms cause the GLB exporter to produce incorrectly scaled or rotated geometry.</li>
+    <li><strong>Merge duplicate vertices.</strong> Edit Mode → Select All → Mesh → Merge by Distance (threshold: 0.001m). Eliminates invisible seams that split normals and cause shading artefacts.</li>
+    <li><strong>Remove non-rendering geometry.</strong> Delete interior faces, hidden objects, and any geometry the camera never sees. On an exterior building model, delete the interior floor slabs and wall cavity geometry — they add triangles but never render.</li>
+    <li><strong>Check and fix normals.</strong> Edit Mode → Overlay → Face Orientation. Red faces have inverted normals; blue faces are correct. Select red faces → Mesh → Normals → Flip.</li>
+    <li><strong>Limit material count.</strong> A single mesh should not have more than 8 materials. More than this causes multiple draw calls per object. Merge similar materials (all concrete surfaces share one material, all glass surfaces share another).</li>
+    <li><strong>Apply all modifiers.</strong> Any unapplied modifier (Subdivision Surface, Mirror, Array) will be exported as-is in some exporters and ignored in others. Apply all modifiers before export.</li>
+    <li><strong>Verify scale.</strong> The building should be life-scale: 1 unit = 1 metre. Check the bounding box (Object Properties → Dimensions). A 10-storey building should be approximately 30m tall.</li>
+  </ol>
+
+  <h3>21.3 Polygon Budgets</h3>
+  <p>These are starting points, not hard limits. Adjust based on your performance targets:</p>
+  <ul>
+    <li><strong>Hero building (exterior + lobby):</strong> 100K–300K triangles</li>
+    <li><strong>Interior furnished room:</strong> 50K–100K triangles</li>
+    <li><strong>Furniture piece:</strong> 5K–20K triangles</li>
+    <li><strong>Decorative accessory:</strong> 500–5K triangles</li>
+  </ul>
+
+  <p>For the Tier-2 simplified experience (Chapter 18), create a separate LOD model at 40–60% of the hero polygon count. Export as a separate GLB (e.g., <code>aurelia-lobby-lod.glb</code>). Load the appropriate LOD based on GPU tier.</p>
+
+  <h3>21.4 GLB Export Settings</h3>
+  <p>In Blender: File → Export → glTF 2.0 (.glb/.gltf). Use these settings:</p>
+
+  <pre><code># Blender GLB export settings (File → Export → glTF 2.0)
+Format:          GLB (single file, textures embedded)
+Include:         Selected Objects only (if exporting part of a scene)
+Data → Mesh:     Apply Modifiers: ✓
+                 UVs: ✓
+                 Normals: ✓
+                 Vertex Colors: ✓ (if used for baked AO)
+                 Tangents: ✗ (Three.js computes these)
+Transform:       +Y Up: ✓ (converts from Blender's Z-up to Three.js Y-up)</code></pre>
+
+  <h3>21.5 Draco Compression</h3>
+  <p>Draco geometry compression reduces GLB file size by 60–80% with no visible quality loss. It is supported natively by <code>useGLTF</code> via the <code>DRACOLoader</code>. Run it on the exported GLB using <code>gltf-transform</code>:</p>
+
+  <pre><code># Install once globally:
+npm install -g @gltf-transform/cli
+
+# Compress with Draco (level 6 is a good balance of size and quality):
+gltf-transform optimize aurelia-lobby.glb aurelia-lobby-v1.glb \
+  --compress draco \
+  --draco.quantizationVolume mesh \
+  --draco.method edgebreaker
+
+# Verify output:
+gltf-transform inspect aurelia-lobby-v1.glb
+# Check: file size, triangle count, texture sizes, material count</code></pre>
+
+  <p>Target: the compressed GLB should be 2–8MB for a hero architectural scene. If it is above 10MB, the model needs further polygon reduction before compression.</p>
+
+  <h3>21.6 Texture Workflow</h3>
+  <p>Source textures from Poly Haven at 2K resolution. Process them before use:</p>
+
+  <pre><code># Install sharp CLI for image processing:
+npm install -g sharp-cli
+
+# Convert albedo/diffuse maps to WebP (smallest file, best quality ratio):
+sharp marble-01-albedo-2k.jpg -o marble-01-albedo-2k.webp --quality 85
+
+# Normal maps: use lossless WebP or PNG (lossy compression breaks normals):
+sharp marble-01-normal-2k.jpg -o marble-01-normal-2k.webp --lossless
+
+# Resize to 1K for secondary surfaces:
+sharp concrete-01-albedo-2k.webp -o concrete-01-albedo-1k.webp --resize 1024</code></pre>
+
+  <p>For production texture delivery, KTX2/BasisU is the most performant format: it is GPU-decompressed directly, saving 4–6× the VRAM compared to WebP (which is CPU-decompressed first). Use drei's <code>KTX2Loader</code>:</p>
+
+  <pre><code>npm install -g @ktx/ktx2
+
+# Convert WebP to KTX2:
+toktx --t2 --encode uastc --uastc_rdo_l 4 \
+  marble-01-albedo-2k.ktx2 marble-01-albedo-2k.webp
+
+# Load in R3F with KTX2Loader:
+import { useKTX2 } from '@react-three/drei';
+const texture = useKTX2('/textures/marble-01-albedo-2k.ktx2');</code></pre>
+
+  <h3>21.7 HDRI Optimization</h3>
+  <p>Raw Poly Haven HDRIs are 20–50MB. Production requires resizing:</p>
+
+  <pre><code># Option A: Resize in Blender's compositor
+# Image Editor → Image → Scale → 1024 × 512 → Export as .hdr
+
+# Option B: Using ffmpeg (faster, scriptable):
+ffmpeg -i patio-compound-4k.hdr \
+  -vf scale=1024:512 \
+  patio-compound-1k.hdr
+
+# Target: < 500KB after resizing to 1024 × 512
+# Use 2048 × 1024 only if the HDRI is also the visible background</code></pre>
+
+  <h3>21.8 Naming Conventions</h3>
+  <p>Consistent naming enables versioning and CDN cache control:</p>
+  <ul>
+    <li>Models: <code>aurelia-lobby-v1.glb</code>, <code>aurelia-lobby-lod-v1.glb</code></li>
+    <li>Textures: <code>marble-01-albedo-2k.webp</code>, <code>concrete-02-normal-1k.webp</code></li>
+    <li>HDRIs: <code>patio-compound-1k.hdr</code>, <code>sky-dusk-1k.hdr</code></li>
+    <li>Poster frames: <code>aurelia-lobby-poster-1920.webp</code>, <code>aurelia-lobby-poster-960.webp</code></li>
+  </ul>
+  <p>Never use query strings for cache-busting. Use versioned filenames (<code>-v1</code>, <code>-v2</code>). CDN caches the exact URL — changing the filename forces a fresh fetch without invalidating the old cache.</p>
+
+  <h3>21.9 CDN Hosting and Cache Strategy</h3>
+  <p>Host all 3D assets (GLB, textures, HDRIs) on a dedicated CDN bucket — not on the same server as your application code. Options: Cloudflare R2 (free egress, generous free tier), AWS S3 + CloudFront (mature, reliable), Bunny CDN (simple, affordable for small projects).</p>
+
+  <pre><code># Required CORS configuration (allows your R3F app to load assets cross-origin):
+# In Cloudflare R2 / S3 bucket CORS settings:
+[
+  {
+    "AllowedOrigins": ["https://aureliaresidences.com", "https://*.framer.website"],
+    "AllowedMethods": ["GET", "HEAD"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["Content-Length"],
+    "MaxAgeSeconds": 86400
+  }
+]
+
+# Required cache headers on all assets (set in CDN dashboard or S3 metadata):
+Cache-Control: public, max-age=31536000, immutable
+# This tells browsers and CDN edges to cache the file for 1 year and never revalidate.
+# When you update an asset, change the filename version number.</code></pre>
+
+  <div class="callout task">
+    <div class="label">★ Chapter Task</div>
+    <h4>Build the Aurelia Asset Pipeline</h4>
+    <p>1. Download an architectural GLB from Sketchfab (search: "luxury apartment" or "modernist villa" → filter by licence: CC0).</p>
+    <p>2. Open in Blender, run the full cleanup checklist. Export as GLB with Y-up.</p>
+    <p>3. Compress with <code>gltf-transform</code> using Draco. Verify file size is under 8MB.</p>
+    <p>4. Download a marble texture set from Poly Haven. Convert albedo to WebP. Convert normal map to lossless WebP.</p>
+    <p>5. Download "Patio Compound" HDRI from Poly Haven. Resize to 1024×512.</p>
+    <p>6. Upload all assets to a Cloudflare R2 bucket (or equivalent). Configure CORS. Set <code>Cache-Control: public, max-age=31536000, immutable</code>.</p>
+    <p>7. Update all asset URLs in your <code>sceneConfig.ts</code> to point to CDN URLs. Load the scene and verify all assets resolve correctly.</p>
+  </div>
+</section>
+
+<!-- ================ CH22 ================ -->
+<section class="chapter" id="ch22">
+  <div class="chap-head">
+    <span class="num">22</span>
+    <h2>Framer Integration — Code Components &amp; Publishing</h2>
+  </div>
+
+  <p>What you will build: A Framer code component that packages the Aurelia Experience for use in any Framer project. The designer can drag it onto the canvas, set its initial mood and model URL from the properties panel, connect it to a Framer CMS collection for hotspot content, and publish — all without touching the R3F code directly.</p>
+
+  <h3>22.1 How Framer Code Components Work</h3>
+  <p>A Framer code component is a TypeScript file that exports a default React component plus an optional <code>addPropertyControls</code> call. Framer imports it and renders it on the canvas. Every prop defined in <code>addPropertyControls</code> appears as a visual control in the properties panel — a color picker, a dropdown, a text field, an image picker, a boolean toggle.</p>
+
+  <p>The component receives those props exactly as a React component receives props. It is standard React. The only Framer-specific imports are <code>addPropertyControls</code> and <code>ControlType</code> from <code>'framer'</code>.</p>
+
+  <h3>22.2 Canvas Sizing in Framer</h3>
+  <p>This is the most common mistake when building Framer code components that contain WebGL. Never set explicit pixel dimensions on the Canvas wrapper. In Framer, the component frame (set by the designer on the canvas) is the container. The component must fill it:</p>
+
+  <pre><code>// ✅ Correct — fills the Framer frame
+export default function AureliaExperience() {
+  return (
+    &lt;div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}&gt;
+      &lt;Canvas style={{ display: 'block', width: '100%', height: '100%' }}&gt;
+        {/* scene */}
+      &lt;/Canvas&gt;
+    &lt;/div&gt;
+  );
+}
+
+// ❌ Wrong — breaks responsive Framer layouts
+export default function AureliaExperience() {
+  return &lt;Canvas style={{ width: '1200px', height: '700px' }}&gt;{/* scene */}&lt;/Canvas&gt;;
+}</code></pre>
+
+  <h3>22.3 The Full Framer Code Component</h3>
+
+  <pre><code>// AureliaFramerComponent.tsx — place in your Framer project's code folder
+import { addPropertyControls, ControlType } from 'framer';
+import { Canvas } from '@react-three/fiber';
+import { Suspense, useState, useEffect } from 'react';
+import { Scene } from './Scene';           // your full experience Scene
+import { detectExperienceTier } from './utils/capabilityCheck';
+import { FallbackExperience } from './FallbackExperience';
+
+interface Props {
+  modelUrl:    string;
+  hdriUrl:     string;
+  defaultMood: 'morning' | 'afternoon' | 'evening';
+  enableTour:  boolean;
+  onEnquire?:  () =&gt; void;
+  onLoaded?:   () =&gt; void;
+}
+
+export default function AureliaExperience({
+  modelUrl    = 'https://cdn.aureliaresidences.com/aurelia-lobby-v1.glb',
+  hdriUrl     = 'https://cdn.aureliaresidences.com/patio-compound-1k.hdr',
+  defaultMood = 'afternoon',
+  enableTour  = false,
+  onLoaded,
+}: Props) {
+  const [tier] = useState(() =&gt; detectExperienceTier());
+  const [sceneReady, setSceneReady] = useState(false);
+
+  // Signal Framer that the scene is ready (for poster-frame fade)
+  useEffect(() =&gt; {
+    if (sceneReady) onLoaded?.();
+  }, [sceneReady]);
+
+  if (tier === 'none') return &lt;FallbackExperience /&gt;;
+
+  return (
+    &lt;div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: '#1d1a15' }}&gt;
+      &lt;Canvas
+        shadows={tier !== 'simplified'}
+        dpr={[1, tier === 'simplified' ? 1 : 2]}
+        camera={{ position: [25, 18, 35], fov: 45 }}
+        style={{ display: 'block', width: '100%', height: '100%' }}
+        gl={{ powerPreference: 'high-performance', antialias: tier !== 'simplified' }}
+      &gt;
+        &lt;Suspense fallback={null} onResolve={() =&gt; setSceneReady(true)}&gt;
+          &lt;Scene
+            modelUrl={modelUrl}
+            hdriUrl={hdriUrl}
+            defaultMood={defaultMood}
+            enableTour={enableTour}
+            simplified={tier === 'simplified'}
+          /&gt;
+        &lt;/Suspense&gt;
+      &lt;/Canvas&gt;
+
+      {/* Poster frame overlay — fades out when sceneReady */}
+      &lt;div style={{
+        position: 'absolute', inset: 0,
+        background: 'url(https://cdn.aureliaresidences.com/aurelia-lobby-poster-1920.webp) center/cover',
+        opacity: sceneReady ? 0 : 1,
+        transition: 'opacity 0.8s ease',
+        pointerEvents: 'none',
+      }} /&gt;
+    &lt;/div&gt;
+  );
+}
+
+addPropertyControls(AureliaExperience, {
+  modelUrl: {
+    type: ControlType.String,
+    title: 'Model URL',
+    defaultValue: 'https://cdn.aureliaresidences.com/aurelia-lobby-v1.glb',
+  },
+  hdriUrl: {
+    type: ControlType.String,
+    title: 'HDRI URL',
+    defaultValue: 'https://cdn.aureliaresidences.com/patio-compound-1k.hdr',
+  },
+  defaultMood: {
+    type: ControlType.Enum,
+    title: 'Default Mood',
+    options: ['morning', 'afternoon', 'evening'],
+    optionTitles: ['Morning', 'Afternoon', 'Evening'],
+    defaultValue: 'afternoon',
+  },
+  enableTour: {
+    type: ControlType.Boolean,
+    title: 'Enable Guided Tour',
+    defaultValue: false,
+  },
+});</code></pre>
+
+  <h3>22.4 CMS Connection in Framer</h3>
+  <p>Framer's Data API allows fetching CMS collection items from inside a code component. Pass the hotspot data to your Scene as a prop:</p>
+
+  <pre><code>import { useEffect, useState } from 'react';
+
+// Inside AureliaExperience:
+const [hotspots, setHotspots] = useState(STATIC_HOTSPOT_FALLBACK);
+
+useEffect(() =&gt; {
+  // Framer CMS endpoint — replace YOUR_PROJECT_ID and COLLECTION_ID
+  fetch(`https://api.framer.com/store/api/v1/YOUR_PROJECT_ID/collections/COLLECTION_ID/items`)
+    .then(r =&gt; r.json())
+    .then(data =&gt; setHotspots(data.items.map(mapFramerCMSToHotspot)))
+    .catch(() =&gt; { /* static fallback already set */ });
+}, []);</code></pre>
+
+  <h3>22.5 Framer-Specific Cautions</h3>
+
+  <div class="callout mistake">
+    <div class="label">⚠ Framer Cautions</div>
+    <p><strong>Bundle size:</strong> Framer bundles all your code component imports together. Three.js (~600KB gzipped) and @react-three/fiber (~80KB) will be included unless you externalize them. Check the component bundle size in Framer's bundle analyzer. If it exceeds 2MB gzipped, load Three.js from unpkg via a dynamic import: <code>const THREE = await import('https://unpkg.com/three@0.165/build/three.module.js')</code>.</p>
+    <p><strong>Preview vs. production:</strong> Framer's canvas preview has known differences from the published site for complex WebGL content. Always test the published site before showing to a client. Use Framer's "Preview" button (desktop preview, not canvas preview) as your reference.</p>
+    <p><strong>Interaction conflicts:</strong> Never add Framer interactions (hover, tap animations) to the frame that wraps an R3F code component. Framer's interaction system modifies the element's CSS transform, which conflicts with the Canvas's coordinate space.</p>
+    <p><strong>Navigation:</strong> Any <code>&lt;a&gt;</code> tags inside <code>&lt;Html&gt;</code> overlays must use Framer's <code>navigate()</code> function for internal links, or <code>target="_blank"</code> for external links. Framer's router intercepts standard anchor clicks on internal URLs.</p>
+  </div>
+
+  <h3>22.6 Publishing and Step-by-Step Embed Guide</h3>
+  <ol>
+    <li>In your Framer project, open the Assets panel → Code → click the + button</li>
+    <li>Paste the contents of <code>AureliaFramerComponent.tsx</code></li>
+    <li>Framer compiles it and shows a preview. Verify the component renders without errors.</li>
+    <li>Drag the component from the Assets panel onto your page canvas</li>
+    <li>Resize the component frame to your desired dimensions (e.g., 1440 × 700px on desktop)</li>
+    <li>In the Properties panel, set Model URL, HDRI URL, and Default Mood</li>
+    <li>Add a breakpoint for mobile: resize the frame to 375px wide, verify it looks correct</li>
+    <li>Click Publish → choose your domain → publish</li>
+    <li>Open the published URL in an incognito tab (not the Framer preview) and verify the experience loads</li>
+  </ol>
+
+  <div class="callout task">
+    <div class="label">★ Chapter Task</div>
+    <h4>Publish the Aurelia Experience to Framer</h4>
+    <p>1. Create a new Framer project (or use your existing Aurelia Residences site).</p>
+    <p>2. Add the AureliaFramerComponent code component using the guide above.</p>
+    <p>3. Configure the model URL to point to your CDN-hosted GLB from Chapter 21.</p>
+    <p>4. Add the component to the home page at full viewport width and 70vh height.</p>
+    <p>5. Add a mobile breakpoint and verify the component degrades correctly on a 375px frame.</p>
+    <p>6. Publish to a Framer subdomain. Open the published URL and verify the poster frame shows during load, the scene loads after, and the poster fades out. Test on a real mobile device.</p>
+  </div>
+</section>
+
+<!-- ================ CH23 ================ -->
+<section class="chapter" id="ch23">
+  <div class="chap-head">
+    <span class="num">23</span>
+    <h2>Webflow Integration — Embeds, CMS &amp; Scroll</h2>
+  </div>
+
+  <p>What you will build: A self-contained JavaScript bundle (built with Vite) that bootstraps the Aurelia Experience into any Webflow page via a custom code embed block. The bundle reads configuration from data attributes on the container div, fetches hotspot content from the Webflow CMS at runtime, and manages the poster frame, tier detection, and analytics entirely inside the embed.</p>
+
+  <h3>23.1 The Webflow Integration Architecture</h3>
+  <p>Unlike Framer, Webflow does not understand React or TypeScript. The integration relies on a pre-built JavaScript bundle hosted on your CDN. Webflow's custom code embed injects a script that loads the bundle and bootstraps the React root into a target div.</p>
+
+  <pre><code>Host page (Webflow)
+├── Div#aurelia-container    ← target div, sized by Webflow designer
+│   └── data-model-url="..."  ← configuration via data attributes
+│   └── data-hdri-url="..."
+│   └── data-default-mood="afternoon"
+└── Embed block
+    └── &lt;script type="module"&gt;
+            import { init } from 'https://cdn.aureliaresidences.com/embed-v1.js';
+            init(document.getElementById('aurelia-container'));
+        &lt;/script&gt;</code></pre>
+
+  <h3>23.2 Building the Embed Bundle with Vite</h3>
+  <p>Create a Vite project specifically for the embed bundle — separate from the main application. The entry point exports an <code>init</code> function that mounts the React component into the target element:</p>
+
+  <pre><code>// webflow-embed/src/embed-entry.ts
+import { createRoot } from 'react-dom/client';
+import { AureliaExperience } from './AureliaExperience';
+
+export function init(container: HTMLElement) {
+  // Guard against double initialization
+  if (container.dataset.initialized) return;
+  container.dataset.initialized = 'true';
+
+  // Read config from data attributes
+  const config = {
+    modelUrl:    container.dataset.modelUrl    || 'https://cdn.aureliaresidences.com/aurelia-lobby-v1.glb',
+    hdriUrl:     container.dataset.hdriUrl     || 'https://cdn.aureliaresidences.com/patio-compound-1k.hdr',
+    defaultMood: (container.dataset.defaultMood || 'afternoon') as 'morning' | 'afternoon' | 'evening',
+  };
+
+  const root = createRoot(container);
+  root.render(&lt;AureliaExperience {...config} /&gt;);
+}</code></pre>
+
+  <pre><code>// webflow-embed/vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    lib: {
+      entry: 'src/embed-entry.ts',
+      formats: ['es'],
+      fileName: () =&gt; 'embed-v1.js',
+    },
+    rollupOptions: {
+      // Externalize Three.js to keep bundle small
+      external: ['three'],
+      output: {
+        globals: { three: 'THREE' },
+      },
+    },
+  },
+});</code></pre>
+
+  <pre><code># Build and deploy:
+npm run build     # outputs dist/embed-v1.js
+# Upload dist/embed-v1.js to your CDN:
+# https://cdn.aureliaresidences.com/embed-v1.js</code></pre>
+
+  <h3>23.3 The Webflow Setup — Step by Step</h3>
+  <ol>
+    <li>In Webflow Designer, add a <strong>Div Block</strong> to your page. Give it ID: <code>aurelia-container</code>.</li>
+    <li>Set its height explicitly: 700px (or use a percentage/vh unit). Webflow divs have zero height by default — the Canvas will render at 0px if this is not set.</li>
+    <li>In the Element Settings panel, add Custom Attributes:
+      <ul>
+        <li>Name: <code>data-model-url</code> | Value: <code>https://cdn.aureliaresidences.com/aurelia-lobby-v1.glb</code></li>
+        <li>Name: <code>data-hdri-url</code> | Value: <code>https://cdn.aureliaresidences.com/patio-compound-1k.hdr</code></li>
+        <li>Name: <code>data-default-mood</code> | Value: <code>afternoon</code></li>
+      </ul>
+    </li>
+    <li>Add an <strong>Embed</strong> element immediately after the div. Paste this code:</li>
+  </ol>
+
+  <pre><code>&lt;!-- Load Three.js from CDN first (externalized from bundle) --&gt;
+&lt;script src="https://unpkg.com/three@0.165/build/three.min.js"&gt;&lt;/script&gt;
+
+&lt;!-- Then load and initialize the Aurelia embed bundle --&gt;
+&lt;script type="module"&gt;
+  import { init } from 'https://cdn.aureliaresidences.com/embed-v1.js';
+
+  // Wait for the DOM to be ready
+  function onReady(fn) {
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+
+  onReady(() =&gt; {
+    const container = document.getElementById('aurelia-container');
+    if (container) init(container);
+  });
+&lt;/script&gt;</code></pre>
+
+  <h3>23.4 Connecting to the Webflow CMS</h3>
+  <p>Webflow's Data API v2 allows fetching CMS collection items from the client side. This means your R3F hotspot content can be managed by the Webflow content team through the Webflow Editor — no developer involvement required for content updates.</p>
+
+  <pre><code>// Inside AureliaExperience, after mount:
+async function fetchWebflowHotspots(siteId: string, collectionId: string): Promise&lt;HotspotData[]&gt; {
+  const res = await fetch(
+    `https://api.webflow.com/v2/collections/${collectionId}/items?live=true`,
+    { headers: { 'Accept': 'application/json' } }
+  );
+  if (!res.ok) throw new Error(`Webflow API error: ${res.status}`);
+  const data = await res.json();
+  return data.items.map((item: WebflowCMSItem) =&gt; ({
+    id:       item.fieldData.slug,
+    label:    item.fieldData.name,
+    position: JSON.parse(item.fieldData['position-json']) as [number, number, number],
+    content: {
+      title: item.fieldData.name,
+      body:  item.fieldData.description,
+      imageUrl: item.fieldData['hero-image']?.url,
+    }
+  }));
+}</code></pre>
+
+  <p>Pass the collection ID via a data attribute: <code>data-collection-id="COLLECTION_ID_HERE"</code>. The content team creates and updates hotspot items in the Webflow CMS; the 3D experience fetches them at runtime.</p>
+
+  <h3>23.5 Scroll Conflict Resolution</h3>
+  <p>When a Webflow site has IX2 (Interactions 2.0) animations on the same page as an R3F embed in scroll mode, the two scroll listeners conflict. The symptoms: IX2 animations jitter, the R3F camera moves erratically, or both systems compete for the scroll position.</p>
+
+  <p>The production solution for Webflow: <strong>do not use scroll-hijacking in the R3F embed</strong>. Instead, drive the camera narrative from canvas-internal touch/drag interaction:</p>
+
+  <pre><code>// Instead of scroll-hijacking, use internal pointer drag to advance the narrative:
+// User drags right = advance to next waypoint
+// User drags left = go to previous waypoint
+// Webflow's page scroll works completely independently
+
+useEffect(() =&gt; {
+  let startX = 0;
+  const container = canvasRef.current;
+
+  const onPointerDown = (e: PointerEvent) =&gt; { startX = e.clientX; };
+  const onPointerUp = (e: PointerEvent) =&gt; {
+    const delta = e.clientX - startX;
+    if (Math.abs(delta) &gt; 50) {
+      delta &lt; 0 ? advanceNarrative() : retreatNarrative();
+    }
+  };
+
+  container?.addEventListener('pointerdown', onPointerDown);
+  container?.addEventListener('pointerup', onPointerUp);
+  return () =&gt; {
+    container?.removeEventListener('pointerdown', onPointerDown);
+    container?.removeEventListener('pointerup', onPointerUp);
+  };
+}, []);</code></pre>
+
+  <div class="callout mistake">
+    <div class="label">⚠ Webflow Cautions</div>
+    <p><strong>Container height:</strong> Always set explicit height on the container div. If you forget, the Canvas renders at 0px height and nothing is visible. Webflow's preview mode may show a default height; the published site will not.</p>
+    <p><strong>Script placement:</strong> Place the embed script after the target div, or in Webflow's Page Settings → Footer Code. Never place it in the <code>&lt;head&gt;</code> — the target div does not exist yet when the script runs.</p>
+    <p><strong>CSP and CDN:</strong> Webflow's Content Security Policy may block scripts from CDN domains it does not recognize. Test your CDN URL in Webflow preview before launch. If blocked, use a Webflow-approved CDN or self-host the bundle on your own domain.</p>
+    <p><strong>Webflow global CSS:</strong> Webflow's reset styles (<code>*</code> selector, body margin, etc.) cascade into <code>&lt;Html&gt;</code> overlay content. Scope all hotspot panel CSS with a high-specificity class name (<code>.aurelia-hotspot-panel</code>) and declare all layout properties explicitly.</p>
+    <p><strong>Double initialization:</strong> If the embed block accidentally appears twice (or if the page is in Webflow's Editor mode), the script runs twice. The double-init guard in <code>embed-entry.ts</code> (<code>if (container.dataset.initialized) return</code>) prevents two React roots from mounting into the same container.</p>
+  </div>
+
+  <div class="callout task">
+    <div class="label">★ Chapter Task</div>
+    <h4>Publish the Aurelia Experience to Webflow</h4>
+    <p>1. Build the embed bundle with Vite: <code>npm run build</code> in the <code>webflow-embed</code> directory.</p>
+    <p>2. Upload <code>embed-v1.js</code> to your CDN. Configure CORS to allow your Webflow domain.</p>
+    <p>3. In your Webflow project, add a div with ID <code>aurelia-container</code>, height 700px, and the data attributes for model URL, HDRI URL, and mood.</p>
+    <p>4. Add the embed script block after the div.</p>
+    <p>5. Create a Webflow CMS collection called "Hotspots" with fields: Name, Description, Position JSON, Hero Image.</p>
+    <p>6. Add three hotspot items to the collection.</p>
+    <p>7. Update the embed to fetch from the Webflow Data API and render the CMS hotspots.</p>
+    <p>8. Publish the Webflow site. Verify the experience loads, the poster frame appears and fades, and hotspot content comes from the CMS.</p>
+  </div>
+</section>
+
+<!-- ================ CH24 ================ -->
+<section class="chapter" id="ch24">
+  <div class="chap-head">
+    <span class="num">24</span>
+    <h2>Production Architecture, Analytics &amp; Client Handoff</h2>
+  </div>
+
+  <p>What you will build: The final production architecture for the Aurelia Experience — a maintainable file structure, a config-driven approach to scene content, an analytics layer, accessibility compliance for 3D interfaces, a QA checklist, and a client handoff package that enables the marketing team to update content without developer involvement.</p>
+
+  <h3>24.1 Production File Structure</h3>
+  <p>The files you have built across Chapters 1–20 need a home that scales. This is the recommended structure for a production Aurelia Experience codebase:</p>
+
+  <pre><code>src/
+  experience/
+    Experience.tsx              — Root component: tier detection, Canvas setup, providers
+    Scene.tsx                   — Scene graph: composes all sub-systems
+    config/
+      sceneConfig.ts            — All tunable values (CDN base URL, CMS endpoint, defaults)
+      cameraWaypoints.ts        — Named camera positions
+    camera/
+      CameraRig.tsx             — Unified camera: presets, scroll, hotspot focus
+      useCameraStore.ts         — Zustand slice: camera state
+    environment/
+      SceneEnvironment.tsx      — HDRI, fog, conditional EffectComposer
+      useGPUTier.ts             — GPU tier detection hook
+    building/
+      AureliaBuilding.tsx       — Main model loader (useGLTF)
+      AureliaBuildingLOD.tsx    — Tier-2 reduced-polygon version
+    hotspots/
+      HotspotSystem.tsx         — Manages all hotspots, selected state
+      Hotspot.tsx               — Individual hotspot mesh + Html panel
+      useHotspotData.ts         — CMS fetch + static fallback
+      hotspotFallback.ts        — Static fallback config
+    ui/
+      LoadingScreen.tsx         — Poster frame during load
+      FallbackExperience.tsx    — Tier-3: no Canvas, poster + carousel
+      NarrativeOverlay.tsx      — Text overlays synced to camera waypoints
+      EnquiryCTA.tsx            — Enquiry button, fires analytics event
+    store/
+      useSceneStore.ts          — Zustand root store
+    utils/
+      capabilityCheck.ts        — WebGL2 check, GPU tier, prefers-reduced-motion
+      analytics.ts              — trackEvent wrapper
+  framer/
+    AureliaFramerComponent.tsx  — Framer code component wrapper
+  webflow-embed/
+    src/
+      embed-entry.ts            — init() bootstrap function
+    vite.config.ts              — Vite build config for embed bundle</code></pre>
+
+  <h3>24.2 Config-Driven Scene Content</h3>
+  <p>Every value that might change between projects or after handoff lives in <code>config/sceneConfig.ts</code>. Components never have configuration hardcoded inside them:</p>
+
+  <pre><code>// src/experience/config/sceneConfig.ts
+export const sceneConfig = {
+  // Asset URLs — update version number when assets change
+  modelUrl:     'https://cdn.aureliaresidences.com/aurelia-lobby-v1.glb',
+  modelLODUrl:  'https://cdn.aureliaresidences.com/aurelia-lobby-lod-v1.glb',
+  hdriUrl:      'https://cdn.aureliaresidences.com/patio-compound-1k.hdr',
+  posterUrl:    'https://cdn.aureliaresidences.com/aurelia-lobby-poster-1920.webp',
+
+  // CMS endpoints
+  hotspotsEndpoint: 'https://api.aureliaresidences.com/hotspots',
+
+  // Performance flags
+  enablePostprocessing: true,      // overridden to false on tier 0
+  enableShadows:        true,      // overridden to false on simplified
+  shadowMapSize:        1024,
+
+  // Analytics
+  analyticsEnabled: true,
+  gaTrackingId:    'G-XXXXXXXXXX',
+
+  // Scene defaults
+  defaultMood:         'afternoon' as const,
+  defaultCameraShot:   'overview'  as const,
+  narrativeDuration:   3000,       // ms per waypoint
+} as const;</code></pre>
+
+  <h3>24.3 Analytics Implementation</h3>
+  <p>Wrap all event tracking in a single utility so the underlying analytics provider can be swapped without touching component code:</p>
+
+  <pre><code>// src/experience/utils/analytics.ts
+import { sceneConfig } from '../config/sceneConfig';
+
+export function trackEvent(
+  eventName: string,
+  params: Record&lt;string, string | number | boolean&gt; = {}
+) {
+  if (!sceneConfig.analyticsEnabled) return;
+  if (typeof window === 'undefined' || !window.gtag) return;
+  window.gtag('event', eventName, params);
+}
+
+// Predefined events — use these everywhere, not ad-hoc strings:
+export const SceneEvents = {
+  LOADED:              'aurelia_scene_loaded',
+  HOTSPOT_OPENED:      'aurelia_hotspot_opened',
+  NARRATIVE_COMPLETED: 'aurelia_narrative_completed',
+  ENQUIRY_CTA_CLICKED: 'aurelia_enquiry_cta_clicked',
+  FALLBACK_SHOWN:      'aurelia_fallback_shown',
+  TIME_OF_DAY_CHANGED: 'aurelia_time_of_day_changed',
+  TOUR_STEP_ADVANCED:  'aurelia_tour_step_advanced',
+} as const;</code></pre>
+
+  <h3>24.4 Accessibility for 3D Experiences</h3>
+  <p>WCAG 2.1 Level AA compliance for an R3F experience has three components:</p>
+
+  <p><strong>1. Reduced-motion compliance</strong> (already added in Ch13): When <code>prefers-reduced-motion: reduce</code> is active, all <code>useFrame</code> animations are skipped and camera transitions are instant instead of lerped. The scene is fully usable — motion is an enhancement, not a requirement.</p>
+
+  <p><strong>2. Keyboard navigation for hotspots:</strong> Hotspots must be reachable by Tab and operable by Enter/Space without a mouse:</p>
+  <pre><code>// Hotspot.tsx — keyboard accessibility additions
+&lt;Html position={position}&gt;
+  &lt;button
+    className="hotspot-trigger"
+    onClick={() =&gt; selectHotspot(id)}
+    onKeyDown={(e) =&gt; e.key === 'Enter' || e.key === ' ' ? selectHotspot(id) : undefined}
+    aria-label={`Open information panel for ${label}`}
+    aria-expanded={isSelected}
+  &gt;
+    {label}
+  &lt;/button&gt;
+&lt;/Html&gt;</code></pre>
+
+  <p><strong>3. Screen reader description:</strong> Add a visually-hidden region that describes the scene and available interactions. Screen reader users skip the WebGL canvas (which is opaque to AT) and navigate this description instead:</p>
+  <pre><code>&lt;div
+  role="region"
+  aria-label="Interactive 3D property experience"
+  style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}
+&gt;
+  &lt;p&gt;
+    An interactive 3D visualization of the Aurelia Residences lobby.
+    Use the hotspot buttons to explore key features. Press Tab to move between hotspots.
+    Press Enter or Space to open a hotspot panel. Press Escape to close.
+  &lt;/p&gt;
+&lt;/div&gt;</code></pre>
+
+  <h3>24.5 Production QA Checklist</h3>
+
+  <div class="callout task">
+    <div class="label">✓ QA Checklist — Run Before Every Client Delivery</div>
+    <h4>Capability &amp; Degradation</h4>
+    <p>○ WebGL2 check fires correctly on unsupported devices (test by disabling hardware acceleration in Chrome → Settings → System → Use graphics acceleration)</p>
+    <p>○ Tier-3 fallback is fully functional and accessible without the 3D scene</p>
+    <p>○ <code>prefers-reduced-motion</code> disables all animations (test in macOS Accessibility → Reduce Motion)</p>
+    <h4>Performance</h4>
+    <p>○ Poster frame visible during model load on Slow 4G (DevTools → Network → Slow 4G)</p>
+    <p>○ Scene loads in under 4 seconds on 4G (measure with Lighthouse)</p>
+    <p>○ Frame time stays under 12ms on 2020-era mid-range mobile (test on real device, not emulator)</p>
+    <p>○ Memory does not grow over a 5-minute session (Chrome DevTools → Memory → Heap Snapshots, compare before and after)</p>
+    <p>○ Draw calls under 50 (check via <code>gl.info.render.calls</code> in dev mode)</p>
+    <h4>Accessibility</h4>
+    <p>○ All hotspot triggers reachable by Tab key only (Tab through the entire page)</p>
+    <p>○ All <code>&lt;Html&gt;</code> overlay text meets WCAG AA contrast (4.5:1 for normal text) — use browser DevTools colour picker</p>
+    <p>○ Enquiry CTA has descriptive accessible label, not just "Click here"</p>
+    <p>○ Screen reader region describes the experience and available interactions</p>
+    <h4>Platform Integration</h4>
+    <p>○ Framer component responsive to canvas resize at 375px, 768px, 1440px widths</p>
+    <p>○ Framer component tested on published site (not just canvas preview)</p>
+    <p>○ Webflow embed visible in Webflow preview mode (not just on publish)</p>
+    <p>○ Webflow embed tested after a page refresh (checks for double-init guard)</p>
+    <p>○ No browser console errors on either platform</p>
+    <h4>Analytics</h4>
+    <p>○ All five predefined events fire in correct order during a walkthrough (verify in GA4 Realtime)</p>
+    <p>○ Fallback event fires when Tier-3 experience loads</p>
+    <p>○ Scene load time event includes realistic duration (not 0ms)</p>
+  </div>
+
+  <h3>24.6 The Client Handoff Package</h3>
+  <p>Deliver these three documents alongside the code. They are as important as the code itself — they are what enables the client to use and maintain the experience without calling you every week.</p>
+
+  <p><strong>Document 1 — Technical Spec:</strong> What was built, the file structure, how to update assets (export → compress → upload → update config), CDN configuration, analytics event schema, known compatibility gaps, performance baseline (measured load time and frame time on the target device).</p>
+
+  <p><strong>Document 2 — Content Guide:</strong> How to add/edit/remove hotspot content in the CMS (screenshots included), how to change the default mood (Framer properties panel / Webflow data attribute), how to update the poster frame image (replace the file at the CDN URL), how to update the property model (export → compress → upload with incremented version → update config).</p>
+
+  <p><strong>Document 3 — Performance Baseline:</strong> Recorded load time on 4G (Chrome DevTools throttle), frame time on the target mobile device (Chrome remote debugging), Lighthouse Performance score, CDN configuration (cache headers, CORS), asset inventory (all files, sizes, CDN URLs, version numbers).</p>
+
+  <div class="callout portfolio">
+    <div class="label">⌂ The Complete Picture</div>
+    <p>You now have the full stack of what a professional interactive architectural visualization studio delivers: a photorealistic R3F experience with cinematic camera, CMS-connected content, graceful mobile degradation, analytics instrumentation, accessibility compliance, a Framer code component, a Webflow embed bundle, a complete asset pipeline, and a client handoff package. This is not a demo. This is a deliverable. The technology — React, Three.js, R3F — is invisible inside it. The product is a buyer standing in front of a building they cannot yet visit, seeing it, feeling it, and clicking "Book a Viewing."</p>
+  </div>
+
+  <div class="callout task">
+    <div class="label">★ Final Task — Complete the Aurelia Residences Studio Deliverable</div>
+    <p>1. Implement the full file structure from section 24.1. Move all files from previous chapters into the correct locations.</p>
+    <p>2. Extract all configuration values to <code>sceneConfig.ts</code>. Verify no hardcoded URLs or values remain in component files.</p>
+    <p>3. Add the <code>trackEvent</code> utility and instrument all five predefined events.</p>
+    <p>4. Add the visually-hidden screen reader region to the experience root.</p>
+    <p>5. Add keyboard navigation (<code>onKeyDown</code>) to all hotspot triggers.</p>
+    <p>6. Run the complete QA checklist. Fix every failed item.</p>
+    <p>7. Write the three handoff documents (Technical Spec, Content Guide, Performance Baseline).</p>
+    <p>8. Deploy to both Framer and Webflow using the patterns from Chapters 22 and 23.</p>
+    <p>9. Record a 3-minute screen capture walkthrough of the experience — desktop and mobile — for your portfolio.</p>
+  </div>
+</section>
 </body>
 </html>
