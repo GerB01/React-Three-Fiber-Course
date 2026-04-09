@@ -428,19 +428,23 @@ hr.rule{border:none;height:1px;background:var(--line);margin:3rem auto;max-width
 
 
 /* Skill map */
-.skill-map{margin:3rem 0;padding:2rem;background:linear-gradient(180deg,var(--paper),var(--cream));border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-soft)}
+.skill-map{max-width:880px;margin:3rem auto;padding:2rem;background:linear-gradient(180deg,var(--paper),var(--cream));border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-soft)}
 .skill-map .title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-style:italic;color:var(--gold);margin-bottom:1.2rem;text-align:center}
 .skill-map svg{display:block;width:100%;height:auto;max-width:100%}
 
 /* Part header */
-.part-header{padding:4rem 0 1rem;border-top:2px solid var(--gold);border-bottom:1px solid var(--line);margin-bottom:0}
+.part-header{max-width:880px;margin:0 auto;padding:4rem 2rem 1rem;border-top:2px solid var(--gold);border-bottom:1px solid var(--line)}
 .part-header .part-num{font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:1.1rem;display:block;margin-bottom:.4rem}
 .part-header h2{font-size:clamp(1.8rem,3vw,2.8rem);margin:0 0 .8rem}
 .part-header .part-desc{color:var(--muted);font-size:1rem;max-width:55ch}
 
-/* Chapter section padding */
-.chapter{padding:4rem 0 3rem;border-bottom:1px solid var(--line)}
+/* Chapter section padding — constrain reading width with comfortable side margins */
+.chapter{max-width:820px;margin:0 auto;padding:4rem 2rem 3rem;border-bottom:1px solid var(--line)}
 .chapter:last-of-type{border-bottom:none}
+.chapter pre{max-width:100%;overflow-x:auto}
+@media(max-width:720px){
+  .chapter,.part-header{padding-left:1.25rem;padding-right:1.25rem}
+}
 
 </style>
 </head>
@@ -2568,7 +2572,7 @@ export default CameraControlScene;</code></pre>
     Free architectural models can be found on Sketchfab. For this book, download a simple modernist house model:
   </p>
   <p>
-    <strong>Recommended:</strong> Search Sketchfab for "small modern house" or "modernist pavilion" and filter by GLB format. Look for models under 5MB (uncompressed). One good example is the "Small Modern House" at https://sketchfab.com/3d-models/small-modern-house-7f56e7c83c9e4b8b9c7e3a1d2f4e5678 (substitute a real Sketchfab link). Download the GLB.
+    <strong>Recommended source:</strong> <a href="https://polyhaven.com/models" target="_blank" rel="noopener">Poly Haven Models</a> — every asset is CC0, free for commercial use, and downloadable as GLB. For this chapter, pick any small architectural model (under 5 MB uncompressed) and rename it to <code>villa.glb</code>. If you prefer Sketchfab, filter by <em>Downloadable</em> + <em>CC license</em> + <em>glTF</em> and confirm the file size before downloading. Always check the license tab before using a model in a commercial project.
   </p>
   <p>
     Place the model file in <code>/public/models/villa.glb</code>.
@@ -2616,16 +2620,18 @@ function ModelFallback() {
 function PropertyModel() {
   const { scene } = useGLTF('/models/villa.glb');
 
-  // Clone the scene so multiple instances don't share geometry
-  const clonedScene = React.useMemo(() => scene.clone(), [scene]);
-
-  // Traverse and ensure all meshes cast/receive shadows
-  clonedScene.traverse((node) => {
-    if (node.isMesh) {
-      node.castShadow = true;
-      node.receiveShadow = true;
-    }
-  });
+  // Clone the scene once and configure shadows inside the same memo
+  // so the traversal does not re-run on every render.
+  const clonedScene = React.useMemo(() => {
+    const copy = scene.clone();
+    copy.traverse((node) => {
+      if (node.isMesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+      }
+    });
+    return copy;
+  }, [scene]);
 
   return &lt;primitive object={clonedScene} position={[0, 0, 0]} scale={1} /&gt;;
 }
@@ -2701,16 +2707,22 @@ export default LoadedModelScene;</code></pre>
 
   <h3>Model Optimization: DRACO Compression</h3>
   <p>
-    Large models slow down loading. Three.js supports DRACO compression, a codec that reduces GLB file size by 70%+ without losing quality. Drei provides a Draco loader:
+    Large models slow down loading. Three.js supports DRACO compression, a codec that reduces GLB file size by 70%+ without losing quality. Drei's <code>useGLTF</code> can decode Draco-compressed GLBs automatically — there is no <code>&lt;Draco /&gt;</code> component. You enable it by passing a Draco decoder path as the second argument:
   </p>
-  <pre><code>import { Draco } from '@react-three/drei';
+  <pre><code>// useGLTF accepts a Draco decoder path as its second arg.
+// Use the Google-hosted decoder, or copy the files into /public/draco/.
+const { scene } = useGLTF(
+  '/models/villa-draco.glb',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/'
+);
 
-&lt;Canvas&gt;
-  &lt;Draco /&gt;
-  {/* Your scene */}
-&lt;/Canvas&gt;</code></pre>
+// Optional: pre-warm the cache so the model starts downloading early.
+useGLTF.preload(
+  '/models/villa-draco.glb',
+  'https://www.gstatic.com/draco/versioned/decoders/1.5.6/'
+);</code></pre>
   <p>
-    DRACO-compressed models load and decompress in the browser. You compress a model once in Blender or online tools, then deploy the compressed GLB. For premium real estate websites, this is essential: a model that takes 30 seconds to load loses users.
+    You compress the source model once with a CLI tool such as <code>gltf-transform optimize input.glb output.glb --compress draco</code>, then load the compressed file as shown above. For premium real estate websites, this is essential: a model that takes 30 seconds to load loses users.
   </p>
 
   <div class="callout key">
@@ -2846,8 +2858,8 @@ export const useExperienceStore = create((set) => ({
   setActivePanel: (id) =>
     set({ activePanel: id }),
 
-  setTouring: (isTuring) =>
-    set({ isTouring: isTuring }),
+  setTouring: (isTouring) =>
+    set({ isTouring }),
 
   clearSelection: () =>
     set({ selectedResidence: null, activePanel: null }),
@@ -3143,8 +3155,8 @@ export default InfoPanel;</code></pre>
 
   <p>A wide establishing shot uses a higher FOV (field of view) — typically 45–50° — to capture the building in context. An approach shot narrows to 35–40° and moves the camera closer, creating intimacy. A detail close-up uses 25–30° FOV, moves very close, and focuses on texture and materiality. This is not abstract theory. It's the difference between a scene that feels premium and one that feels like a tech demo.</p>
 
-  <h3>Camera Placement: The Golden Triangle</h3>
-  <p>Premium architectural visualization follows a rule: position your camera at 45° to a corner of the building, at eye level (approximately 1.7 meters), and far enough away to see both the structure and its surroundings. This creates visual balance and drama. Never point straight at a flat face — always angle toward a corner. This one principle transforms your scene from flat to cinematic.</p>
+  <h3>Camera Placement: A Framework I Use</h3>
+  <p>One framing rule I keep coming back to for architectural shots: position the camera at roughly 45° to a corner of the building, around eye level (≈1.7 meters), and far enough away to see both the structure and its surroundings. Pointing straight at a flat face tends to look static; angling toward a corner gives the eye depth to read. It's a starting point, not a law — but it's a useful default.</p>
 
   <h3>Implementing CameraRig.tsx</h3>
 
@@ -3188,34 +3200,28 @@ export function CameraRig() {
   ]);
 
   const activeShotName = useExperienceStore((state) =&gt; state.activeShot);
-  const velocityRef = useRef({ position: new Vector3(), target: new Vector3() });
+  const desiredPosition = useRef(new Vector3(25, 18, 35));
+  const desiredTarget = useRef(new Vector3(0, 8, 0));
+  const currentTarget = useRef(new Vector3(0, 8, 0));
 
-  // On shot change, define the target position and target
+  // On shot change, store the new desired position/target/fov
   useEffect(() =&gt; {
     const shot = cameraPositions.current.find((s) =&gt; s.name === activeShotName);
     if (shot) {
-      velocityRef.current.position = shot.position.clone();
-      velocityRef.current.target = shot.target.clone();
+      desiredPosition.current.copy(shot.position);
+      desiredTarget.current.copy(shot.target);
       camera.fov = shot.fov;
       camera.updateProjectionMatrix();
     }
   }, [activeShotName, camera]);
 
   useFrame(() =&gt; {
-    // Smooth lerp camera toward target position (easing: 0.05 = 20 frames to settle)
-    camera.position.lerp(velocityRef.current.position, 0.05);
+    // Smooth lerp camera position toward desired (0.05 ≈ 20 frames to settle)
+    camera.position.lerp(desiredPosition.current, 0.05);
 
-    // Smooth lerp camera look-at target
-    const currentTarget = new Vector3();
-    camera.getWorldDirection(currentTarget);
-    const targetNormalized = velocityRef.current.target
-      .clone()
-      .sub(camera.position)
-      .normalize();
-    currentTarget.lerp(targetNormalized, 0.05);
-
-    // Update camera to point at the lerped target
-    camera.lookAt(velocityRef.current.target);
+    // Smooth lerp the look-at point itself, then aim the camera at it
+    currentTarget.current.lerp(desiredTarget.current, 0.05);
+    camera.lookAt(currentTarget.current);
   });
 
   return null; // This is a logic component, no visual output
@@ -3276,56 +3282,36 @@ export function CameraRig() {
   <h3>Implementing LightingRig.tsx</h3>
 
   <pre><code>// src/experience/LightingRig.tsx
-import { useEffect, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
-import { Color, DirectionalLight, PointLight } from 'three';
+// LightingRig is a pure declarative R3F component. It does NOT mutate the
+// Three.js scene by hand — it just renders &lt;ambientLight&gt;, &lt;directionalLight&gt;,
+// and &lt;pointLight&gt; as children, and lets the reconciler do the work.
 
 type Mood = 'morning' | 'afternoon' | 'evening';
 
-interface MoodLighting {
-  ambientColor: Color;
-  ambientIntensity: number;
-  directionalColor: Color;
-  directionalIntensity: number;
-  directionalPosition: [number, number, number];
-  accentColor: Color;
-  accentIntensity: number;
-  accentPosition: [number, number, number];
+interface MoodPreset {
+  ambient:     { color: string; intensity: number };
+  directional: { color: string; intensity: number; position: [number, number, number] };
+  accent:      { color: string; intensity: number; position: [number, number, number]; distance: number };
 }
 
-const moodPresets: Record&lt;Mood, MoodLighting&gt; = {
+const moodPresets: Record&lt;Mood, MoodPreset&gt; = {
   morning: {
-    // Cool, high-contrast morning light — side-lit with long shadows
-    ambientColor: new Color(0xb8d4f1), // soft cool blue
-    ambientIntensity: 0.35,
-    directionalColor: new Color(0xffeedd), // pale warm sun
-    directionalIntensity: 1.2,
-    directionalPosition: [-20, 25, 15],
-    accentColor: new Color(0xffeedd),
-    accentIntensity: 0.2,
-    accentPosition: [15, 12, 20],
+    // Cool, high-contrast — side-lit with long shadows
+    ambient:     { color: '#b8d4f1', intensity: 0.35 },
+    directional: { color: '#ffeedd', intensity: 1.2, position: [-20, 25, 15] },
+    accent:      { color: '#ffeedd', intensity: 0.2, position: [ 15, 12, 20], distance: 60 },
   },
   afternoon: {
-    // Warm, soft, balanced light — the premium real estate standard
-    ambientColor: new Color(0xf0e8d8), // warm cream
-    ambientIntensity: 0.5,
-    directionalColor: new Color(0xffd989), // golden sun
-    directionalIntensity: 0.9,
-    directionalPosition: [15, 22, 12],
-    accentColor: new Color(0xffb347), // soft orange
-    accentIntensity: 0.15,
-    accentPosition: [-12, 15, 18],
+    // Warm, soft, balanced
+    ambient:     { color: '#f0e8d8', intensity: 0.5 },
+    directional: { color: '#ffd989', intensity: 0.9, position: [ 15, 22, 12] },
+    accent:      { color: '#ffb347', intensity: 0.15, position: [-12, 15, 18], distance: 60 },
   },
   evening: {
-    // Deep amber, dramatic light — mystery and luxury
-    ambientColor: new Color(0x3a2f1b), // deep brown shadow
-    ambientIntensity: 0.25,
-    directionalColor: new Color(0xff9944), // deep amber sun
-    directionalIntensity: 1.0,
-    directionalPosition: [18, 15, -10],
-    accentColor: new Color(0xffaa55), // warm accent
-    accentIntensity: 0.3,
-    accentPosition: [-15, 18, 20],
+    // Deep amber, dramatic
+    ambient:     { color: '#3a2f1b', intensity: 0.25 },
+    directional: { color: '#ff9944', intensity: 1.0, position: [ 18, 15,-10] },
+    accent:      { color: '#ffaa55', intensity: 0.3, position: [-15, 18, 20], distance: 60 },
   },
 };
 
@@ -3334,62 +3320,35 @@ interface LightingRigProps {
 }
 
 export function LightingRig({ mood = 'afternoon' }: LightingRigProps) {
-  const { scene } = useThree();
-  const lightRefs = useRef&lt;{
-    directional: DirectionalLight | null;
-    pointLight: PointLight | null;
-  }&gt;({ directional: null, pointLight: null });
+  const p = moodPresets[mood];
 
-  useEffect(() =&gt; {
-    const preset = moodPresets[mood];
+  return (
+    &lt;&gt;
+      &lt;ambientLight color={p.ambient.color} intensity={p.ambient.intensity} /&gt;
 
-    // Ambient light: global fill, non-directional, sets base tone
-    let ambientLight = scene.getObjectByName('ambientLight') as any;
-    if (!ambientLight) {
-      const { AmbientLight } = require('three');
-      ambientLight = new AmbientLight();
-      ambientLight.name = 'ambientLight';
-      scene.add(ambientLight);
-    }
-    ambientLight.color.copy(preset.ambientColor);
-    ambientLight.intensity = preset.ambientIntensity;
+      &lt;directionalLight
+        color={p.directional.color}
+        intensity={p.directional.intensity}
+        position={p.directional.position}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-left={-50}
+        shadow-camera-right={50}
+        shadow-camera-top={50}
+        shadow-camera-bottom={-50}
+        shadow-camera-near={0.1}
+        shadow-camera-far={100}
+      /&gt;
 
-    // Directional light: main light source with strong direction and shadow
-    let directionalLight = scene.getObjectByName('directionalLight') as any;
-    if (!directionalLight) {
-      directionalLight = new DirectionalLight();
-      directionalLight.name = 'directionalLight';
-      directionalLight.castShadow = true;
-      directionalLight.shadow.mapSize.width = 2048;
-      directionalLight.shadow.mapSize.height = 2048;
-      directionalLight.shadow.camera.left = -50;
-      directionalLight.shadow.camera.right = 50;
-      directionalLight.shadow.camera.top = 50;
-      directionalLight.shadow.camera.bottom = -50;
-      directionalLight.shadow.camera.near = 0.1;
-      directionalLight.shadow.camera.far = 100;
-      scene.add(directionalLight);
-    }
-    directionalLight.color.copy(preset.directionalColor);
-    directionalLight.intensity = preset.directionalIntensity;
-    directionalLight.position.set(...preset.directionalPosition);
-    lightRefs.current.directional = directionalLight;
-
-    // Point light: warm accent light to create dimension and softness
-    let pointLight = scene.getObjectByName('accentLight') as any;
-    if (!pointLight) {
-      pointLight = new PointLight();
-      pointLight.name = 'accentLight';
-      scene.add(pointLight);
-    }
-    pointLight.color.copy(preset.accentColor);
-    pointLight.intensity = preset.accentIntensity;
-    pointLight.position.set(...preset.accentPosition);
-    pointLight.distance = 60; // light falloff distance
-    lightRefs.current.pointLight = pointLight;
-  }, [mood, scene]);
-
-  return null; // This is a logic component
+      &lt;pointLight
+        color={p.accent.color}
+        intensity={p.accent.intensity}
+        position={p.accent.position}
+        distance={p.accent.distance}
+      /&gt;
+    &lt;/&gt;
+  );
 }
 </code></pre>
 
@@ -3548,7 +3507,6 @@ export interface ScrollCameraWaypoint {
   position: Vector3;
   target: Vector3;
   fov: number;
-  dwell?: number; // milliseconds to pause at this waypoint
 }
 
 interface ScrollCameraOptions {
@@ -3560,8 +3518,6 @@ interface ScrollCameraOptions {
 export function useScrollCamera(options: ScrollCameraOptions) {
   const { camera } = useThree();
   const scrollProgress = useRef(0);
-  const lastWaypoint = useRef(0);
-  const dwellTimeoutRef = useRef&lt;NodeJS.Timeout | null&gt;(null);
 
   const { waypoints, totalScrollHeight = window.innerHeight * 3, enabled = true } = options;
 
@@ -3643,14 +3599,21 @@ useEffect(() =&gt; {
 
   <p>2. Disable other camera controls (like OrbitControls) when scroll camera is active, to avoid conflicts:</p>
 
-  <pre><code>// In PropertyExperience:
+  <pre><code>// useScrollCamera is a HOOK — you cannot use it directly as JSX.
+// Wrap it in a tiny driver component that calls the hook and returns null.
+function ScrollCameraDriver(props) {
+  useScrollCamera(props);
+  return null;
+}
+
+// In PropertyExperience:
 const isScrollMode = useExperienceStore((state) =&gt; state.cameraMode) === 'scroll';
 return (
   &lt;&gt;
     &lt;Canvas&gt;
       {/* Canvas content */}
       {isScrollMode &amp;&amp; (
-        &lt;useScrollCamera
+        &lt;ScrollCameraDriver
           waypoints={[
             {
               position: new Vector3(25, 18, 35),
@@ -3771,11 +3734,6 @@ export function PropertyExperience() {
         {/* Interactive hotspots */}
         &lt;HotspotManager /&gt;
       &lt;/Suspense&gt;
-
-      {/* HTML overlay for UI panels, captions, etc. */}
-      &lt;Html fullScreen&gt;
-        {/* Hotspot detail panels, captions */}
-      &lt;/Html&gt;
     &lt;/Canvas&gt;
   );
 }
@@ -3859,7 +3817,7 @@ import { Sky } from '@react-three/drei';
   <h3>What You Will Build</h3>
   <p>Not a new feature, but a critical design framework. This chapter teaches you to recognize what separates a premium 3D experience from an amateur one. You'll audit your PropertyExperience.tsx against seven principles, and we'll show before-and-after comparisons of the same building rendered poorly vs. beautifully.</p>
 
-  <h3>The Seven Principles of Premium 3D</h3>
+  <h3>Seven Principles I Lean On</h3>
 
   <p><strong>1. Restraint</strong> — Premium spaces move slowly. Lights dim intentionally. The camera pauses. Nothing is constantly animating or pulsing. A scene with constant motion feels frantic; a scene with deliberate stillness feels curated.</p>
 
@@ -3992,7 +3950,7 @@ Ask yourself: Does this look like a premium brand website, or a tech demo?
   <h3>Implementing Hotspot.tsx</h3>
 
   <pre><code>// src/experience/Hotspot.tsx
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Mesh, Vector3 } from 'three';
 import { Html } from '@react-three/drei';
@@ -4011,7 +3969,7 @@ export function Hotspot({
   onClick,
 }: HotspotProps) {
   const meshRef = useRef&lt;Mesh&gt;(null);
-  const isHovered = useRef(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Pulsing animation: scale oscillates between 0.8 and 1.2
   useFrame(({ clock }) =&gt; {
@@ -4031,25 +3989,25 @@ export function Hotspot({
           onClick();
         }}
         onPointerEnter={() =&gt; {
-          isHovered.current = true;
+          setIsHovered(true);
           document.body.style.cursor = 'pointer';
         }}
         onPointerLeave={() =&gt; {
-          isHovered.current = false;
+          setIsHovered(false);
           document.body.style.cursor = 'auto';
         }}
       &gt;
         &lt;sphereGeometry args={[0.5, 32, 32]} /&gt;
         &lt;meshStandardMaterial
-          color={isHovered.current ? '#c9a866' : '#a8864b'} // gold: soft or normal
-          emissive={isHovered.current ? '#a8864b' : '#000000'}
+          color={isHovered ? '#c9a866' : '#a8864b'} // gold: soft or normal
+          emissive={isHovered ? '#a8864b' : '#000000'}
           metalness={0.6}
           roughness={0.3}
         /&gt;
       &lt;/mesh&gt;
 
       {/* Tooltip label: appears on hover */}
-      {isHovered.current &amp;&amp; (
+      {isHovered &amp;&amp; (
         &lt;Html scale={0.08}&gt;
           &lt;div
             style={{
@@ -4404,9 +4362,11 @@ export function PropertyExperience() {
         {/* Cinematic camera: only use when not in scroll mode */}
         {cameraMode === 'orbit' &amp;&amp; &lt;CameraRig /&gt;}
 
-        {/* Scroll-driven camera: only use when in scroll mode */}
+        {/* Scroll-driven camera: only use when in scroll mode.
+            ScrollCameraDriver is a tiny wrapper that calls the
+            useScrollCamera hook — see Chapter 13. */}
         {cameraMode === 'scroll' &amp;&amp; (
-          &lt;useScrollCamera
+          &lt;ScrollCameraDriver
             waypoints={scrollWaypoints}
             totalScrollHeight={window.innerHeight * 3}
             enabled={true}
@@ -4629,22 +4589,20 @@ export function MobileCheck({ mobileImageUrl = '/aurelia-hero.jpg' }: MobileChec
   <p>If you want to support WebGL on mobile devices (higher-end Android phones, newer iPhones), optimize the Canvas:</p>
 
   <pre><code>// In PropertyExperience.tsx, use device detection to adjust Canvas props:
-import { getTargetDPR, getCanvasResolution } from '../utils/deviceDetection';
+import { getTargetDPR } from '../utils/deviceDetection';
 
 export function PropertyExperience() {
-  const dpr = getTargetDPR();
-  const pixelRatio = getCanvasResolution();
+  const dpr = getTargetDPR(); // e.g. 1 on mobile, 2 on desktop
 
   return (
     &lt;Canvas
       shadows="soft"
-      dpr={[1, dpr]} // Mobile: 1x, Desktop: 2x
+      dpr={[1, dpr]} // R3F clamps the renderer pixel ratio to this range
       gl={{
         antialias: true,
         alpha: true,
         preserveDrawingBuffer: false,
         powerPreference: 'high-performance',
-        pixelRatio: pixelRatio, // Reduce resolution on mobile
       }}
       camera={{ position: [25, 18, 35], fov: 45 }}
     &gt;
@@ -4654,11 +4612,9 @@ export function PropertyExperience() {
 }
 </code></pre>
 
-  <p><strong>dpr (device pixel ratio):</strong> dpr={[1, dpr]} means min DPR is 1 (mobile), max is dpr value (desktop). This prevents over-rendering on mobile.</p>
+  <p><strong>dpr (device pixel ratio):</strong> <code>dpr={[1, dpr]}</code> is the only knob you need. R3F clamps the renderer pixel ratio between those bounds. There is no <code>pixelRatio</code> field on <code>WebGLRenderer</code>; do not pass one inside <code>gl={{ ... }}</code>. Lowering the upper bound from 2 to 1 quarters the pixel count, with little perceived loss on a small mobile screen.</p>
 
-  <p><strong>pixelRatio:</strong> Rendering at 0.75 or 0.5 of the screen resolution saves significant GPU work. The image is still recognizable; it's just not as sharp. On a small mobile screen, users won't notice.</p>
-
-  <p><strong>gl props:</strong> We set powerPreference: 'high-performance' to use the discrete GPU if available. preserveDrawingBuffer: false (the default) means WebGL can optimize memory usage.</p>
+  <p><strong>gl props:</strong> <code>powerPreference: 'high-performance'</code> requests the discrete GPU when available. <code>preserveDrawingBuffer: false</code> (the default) lets WebGL optimize memory.</p>
 
   <h3>Disabling Features on Mobile</h3>
 
@@ -4675,8 +4631,9 @@ export function PropertyExperience() {
       &lt;Suspense fallback={null}&gt;
         &lt;AureliaModel /&gt;
 
-        {/* Only use scroll camera on desktop */}
-        {!isMobile &amp;&amp; &lt;useScrollCamera ... /&gt;}
+        {/* Only use scroll camera on desktop. ScrollCameraDriver wraps
+            the useScrollCamera hook in a component (see Chapter 13). */}
+        {!isMobile &amp;&amp; &lt;ScrollCameraDriver ... /&gt;}
 
         &lt;LightingRig mood={mood} /&gt;
 
@@ -4785,38 +4742,36 @@ import { PerformanceMonitor } from '@react-three/drei';
 
   <pre><code>// src/experience/InstancedTrees.tsx
 import { useRef, useEffect } from 'react';
-import { Mesh } from 'three';
+import { InstancedMesh, Object3D } from 'three';
 
 interface InstancedTreesProps {
-  count: number; // Number of trees
+  count: number;   // Number of trees
   spacing: number; // Distance between trees
 }
 
 export function InstancedTrees({ count, spacing }: InstancedTreesProps) {
-  const meshRef = useRef&lt;Mesh&gt;(null);
+  const meshRef = useRef&lt;InstancedMesh&gt;(null);
 
   useEffect(() =&gt; {
     if (!meshRef.current) return;
 
-    // Set the position of each instance
+    // Reusable dummy Object3D so we don't allocate per instance.
+    const dummy = new Object3D();
     for (let i = 0; i &lt; count; i++) {
-      const position = new THREE.Vector3(i * spacing, 0, 0);
-      meshRef.current.setMatrixAt(i, new THREE.Matrix4().setPosition(position));
+      dummy.position.set(i * spacing, 0, 0);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
     }
-
-    // Signal that the instance matrix needs to be updated
     meshRef.current.instanceMatrix.needsUpdate = true;
   }, [count, spacing]);
 
+  // Use JSX intrinsics for geometry and material — they live for the
+  // component's lifetime and dispose automatically on unmount.
   return (
-    &lt;instancedMesh
-      ref={meshRef}
-      args={[
-        new THREE.ConeGeometry(0.5, 3, 8), // Tree cone geometry
-        new THREE.MeshStandardMaterial({ color: 0x2d5016 }), // Tree material
-        count, // Number of instances
-      ]}
-    /&gt;
+    &lt;instancedMesh ref={meshRef} args={[undefined, undefined, count]}&gt;
+      &lt;coneGeometry args={[0.5, 3, 8]} /&gt;
+      &lt;meshStandardMaterial color="#2d5016" /&gt;
+    &lt;/instancedMesh&gt;
   );
 }
 </code></pre>
@@ -4860,12 +4815,19 @@ export function InstancedTrees({ count, spacing }: InstancedTreesProps) {
 
   <p>If your Aurelia model is a large GLB file, compress it using Draco compression:</p>
 
-  <pre><code>// Terminal command to compress GLB with Draco:
-// Install: npm install -g @gltf-transform/cli
-// Command: gltf-transform optimize aurelia.glb aurelia-optimized.glb --compress draco
+  <pre><code>// Terminal — compress a GLB with Draco using gltf-transform:
+//   npm install -g @gltf-transform/cli
+//   gltf-transform optimize aurelia.glb aurelia-optimized.glb --compress draco
 
-// Load the optimized model:
-&lt;useGLTF url="/models/aurelia-optimized.glb" /&gt;
+// In your component, load the optimized model with the useGLTF hook
+// (it is a hook, not a JSX component) and pass the Draco decoder path:
+function AureliaModel() {
+  const { scene } = useGLTF(
+    '/models/aurelia-optimized.glb',
+    'https://www.gstatic.com/draco/versioned/decoders/1.5.6/'
+  );
+  return &lt;primitive object={scene} /&gt;;
+}
 </code></pre>
 
   <p>Draco compression reduces GLB file size by 50–80% with minimal quality loss. A 10MB model becomes 1–2MB.</p>
@@ -4986,7 +4948,7 @@ useFrame(() =&gt; {
   <h3>Complete Zustand Store</h3>
 
   <pre><code>// src/store/experienceStore.ts
-import create from 'zustand';
+import { create } from 'zustand';
 import { Vector3 } from 'three';
 
 export type Mood = 'morning' | 'afternoon' | 'evening';
@@ -5053,6 +5015,13 @@ import { useScrollCamera } from './useScrollCamera';
 import { useExperienceStore } from '../store/experienceStore';
 import { isMobileDevice, getTargetDPR } from '../utils/deviceDetection';
 
+// useScrollCamera is a hook — wrap it in a component so we can mount
+// it conditionally inside &lt;Canvas&gt;.
+function ScrollCameraDriver(props: Parameters&lt;typeof useScrollCamera&gt;[0]) {
+  useScrollCamera(props);
+  return null;
+}
+
 export function PropertyExperience() {
   const [isMobile, setIsMobile] = useState(false);
   
@@ -5110,7 +5079,9 @@ export function PropertyExperience() {
         pointerEvents: cameraMode === 'scroll' ? 'none' : 'auto',
       }}
     &gt;
-      &lt;Suspense fallback={&lt;Preload all /&gt;}&gt;
+      &lt;Suspense fallback={null}&gt;
+        {/* Pre-warm GPU caches once the scene mounts */}
+        &lt;Preload all /&gt;
         {/* Performance monitoring */}
         &lt;PerformanceMonitor&gt;
           {/* Main 3D model */}
@@ -5119,7 +5090,7 @@ export function PropertyExperience() {
           {/* Camera systems */}
           {cameraMode === 'orbit' &amp;&amp; &lt;CameraRig /&gt;}
           {cameraMode === 'scroll' &amp;&amp; (
-            &lt;useScrollCamera
+            &lt;ScrollCameraDriver
               waypoints={scrollWaypoints}
               totalScrollHeight={window.innerHeight * 3}
               enabled={true}
